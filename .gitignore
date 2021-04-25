@@ -1,6 +1,8 @@
 # Project specific
-graph_images/
-error_logs/
+graph_images/*
+!graph_images/empty_file_for_git.txt
+error_logs/*
+!error_logs/empty_file_for_git.txt
 
 # Editors
 .vscode/
