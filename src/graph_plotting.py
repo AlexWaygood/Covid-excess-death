@@ -1,92 +1,114 @@
 import src.unchanging_constants as uc
 import src.settings as st
-from pandas import DataFrame
+from pandas import DataFrame, read_csv
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
-from os import path, getcwd
+from os import path
 from datetime import datetime
+from typing import Any
 
 
 rcParams[uc.FRAMEALPHA] = st.LEGEND_OPACITY
 rcParams[uc.FACECOLOR] = st.BACKGROUND_COLOUR
 
 
+def FetchFTData() -> DataFrame:
+    return read_csv(st.FT_DATA_URL, dtype=st.FT_DATA_TYPES, parse_dates=[uc.DATE, ])
+
+
+class GraphPlotter:
+    __slots__ =  'FT_data', 'FT_Countries'
+
+    def __init__(self) -> None:
+        self.FT_data = FetchFTData()
+        self.FT_Countries = set(self.FT_data.country.to_list())
+
+    def ValidateCountryName(self, CountryName: str) -> str:
+        if CountryName not in self.FT_Countries:
+            raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
+        return CountryName
+
+
 def PNGFilePath() -> str:
-	return path.join(
-		st.EXPORT_FILE_PATH,
-		f'Covid graph {str(datetime.now()).replace(":", ".")}.{st.EXPORT_FILE_TYPE}'
-	)
+    return path.join(
+        st.EXPORT_FILE_PATH,
+        f'Covid graph {str(datetime.now()).replace(":", ".")}.{st.EXPORT_FILE_TYPE}'
+    )
 
 
 def PlotAsGraph(
-		data: DataFrame,
-		StartDate: str,
-		GUIUsage: bool = False,
-		ImageExport: bool = False
-) -> None:
+        data: DataFrame,
+        StartDate: str,
+        GUIUsage: bool = False,
+        SaveFile: bool = False,
+        ReturnImage: bool = False
+) -> Any:
 
-	ax = data.plot(figsize=(st.FIGURE_WIDTH, st.FIGURE_HEIGHT))
-	ax.set_facecolor(st.BACKGROUND_COLOUR)
+    ax = data.plot(figsize=(st.FIGURE_WIDTH, st.FIGURE_HEIGHT))
+    ax.set_facecolor(st.BACKGROUND_COLOUR)
 
-	plt.suptitle(
-		st.GRAPH_TITLE,
-		size=st.TITLE_SIZE,
-		fontfamily=st.TITLE_FONT,
-		color=st.TITLE_COLOUR,
-		y=st.GRAPH_TITLE_POSITION
-	)
+    plt.suptitle(
+        st.GRAPH_TITLE,
+        size=st.TITLE_SIZE,
+        fontfamily=st.TITLE_FONT,
+        color=st.TITLE_COLOUR,
+        y=st.GRAPH_TITLE_POSITION
+    )
 
-	plt.title(
-		st.SUB_TITLE,
-		pad=st.SUB_TITLE_PADDING_FROM_GRAPH,
-		color=st.SUB_TITLE_COLOUR,
-		fontfamily=st.SUB_TITLE_FONT
-	)
+    plt.title(
+        st.SUB_TITLE,
+        pad=st.SUB_TITLE_PADDING_FROM_GRAPH,
+        color=st.SUB_TITLE_COLOUR,
+        fontfamily=st.SUB_TITLE_FONT
+    )
 
-	for i in st.HORIZONTAL_LINE_POSITIONS:
-		plt.hlines(
-			i,
-			StartDate,
-			st.END_DATE,
-			colors=st.HORIZONTAL_LINE_COLOUR,
-			linestyles=st.HORIZONTAL_LINE_STYLE,
-			linewidths=st.HORIZONTAL_LINE_WIDTH
-		)
+    for i in st.HORIZONTAL_LINE_POSITIONS:
+        plt.hlines(
+            i,
+            StartDate,
+            st.END_DATE,
+            colors=st.HORIZONTAL_LINE_COLOUR,
+            linestyles=st.HORIZONTAL_LINE_STYLE,
+            linewidths=st.HORIZONTAL_LINE_WIDTH
+        )
 
-	plt.subplots_adjust(top=st.GRAPH_TOP, bottom=st.GRAPH_BOTTOM)
+    plt.subplots_adjust(top=st.GRAPH_TOP, bottom=st.GRAPH_BOTTOM)
 
-	plt.xlabel(
-		st.COPYRIGHT_LABEL,
-		fontfamily=st.COPYRIGHT_LABEL_FONT,
-		color=st.COPYRIGHT_LABEL_COLOUR,
-		labelpad=st.COPYRIGHT_LABEL_PADDING_FROM_X_AXIS
-	)
+    plt.xlabel(
+        st.COPYRIGHT_LABEL,
+        fontfamily=st.COPYRIGHT_LABEL_FONT,
+        color=st.COPYRIGHT_LABEL_COLOUR,
+        labelpad=st.COPYRIGHT_LABEL_PADDING_FROM_X_AXIS
+    )
 
-	ax.tick_params(
-		axis=uc.Y_AXIS,
-		which=uc.BOTH,
-		left=False,
-		right=False,
-		labelcolor=st.AXIS_TICK_COLOUR
-	)
+    ax.tick_params(
+        axis=uc.Y_AXIS,
+        which=uc.BOTH,
+        left=False,
+        right=False,
+        labelcolor=st.AXIS_TICK_COLOUR
+    )
 
-	ax.tick_params(axis=uc.X_AXIS, which=uc.BOTH, colors=st.AXIS_TICK_COLOUR)
+    ax.tick_params(axis=uc.X_AXIS, which=uc.BOTH, colors=st.AXIS_TICK_COLOUR)
 
-	plt.yticks(fontname=st.AXIS_FONT)
-	plt.xticks(fontname=st.AXIS_FONT)
+    plt.yticks(fontname=st.AXIS_FONT)
+    plt.xticks(fontname=st.AXIS_FONT)
 
-	for s in (uc.TOP, uc.RIGHT, uc.LEFT, uc.BOTTOM):
-		ax.spines[s].set_visible(False)
+    for s in (uc.TOP, uc.RIGHT, uc.LEFT, uc.BOTTOM):
+        ax.spines[s].set_visible(False)
 
-	plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontfamily=st.LEGEND_FONT)
+    plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontfamily=st.LEGEND_FONT)
 
-	if ImageExport:
-		try:
-			plt.savefig(PNGFilePath())
-		except FileNotFoundError as e:
-			print(getcwd())
-			print(path.abspath(PNGFilePath()))
-			raise e
+    if SaveFile:
+        plt.savefig(PNGFilePath())
 
-	if GUIUsage:
-		plt.show()
+    if GUIUsage:
+        plt.show()
+
+    if ReturnImage:
+        from io import BytesIO
+        from flask import send_file
+        buf = BytesIO()
+        plt.savefig(buf)
+        buf.seek(0)
+        return send_file(buf, mimetype='image/png')

@@ -2,10 +2,39 @@ from os import path
 from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, INTERPOLATE, SPLINE
 from datetime import datetime
 
-"""Settings to alter how the graph is constructed"""
+"""Settings for the whole project"""
 
-# MISC SETTINGS
-QUIT_STRING = 'Q'
+
+# USER INPUT SETTINGS
+QUIT = 'Q'
+
+WELCOME_MESSAGE = """Welcome to Alex Waygood's interactive data viewer for weekly excess deaths!
+This script uses the FT's data. However, the script itself was written by Alex Waygood, and is in no way affiliated with the FT.
+"""
+
+LOADING_FT_DATA = "Loading FT data..."
+FT_DATA_LOADED = "FT data has been loaded!"
+
+LIST_OF_COUNTRIES_QUESTION = "Would you like to see a list of available countries in the FT's dataset? "
+ANNOUNCE_LIST_OF_COUNTRIES = "The following countries are available in the FT's dataset: "
+COUNTRY_NOT_FOUND_MESSAGE = 'Country not in FT dataset; please try again.'
+HOW_MANY_COUNTRIES_MESSAGE = 'Please enter how many countries you want to compare: '
+HOW_MANY_COUNTRIES_BUTTON_LABEL = 'Submit'
+INVALID_RESPONSE = 'Not a valid response, please try again.'
+
+UNEXPECTED_ERROR_MESSAGE = 'Looks like there was an error here! ' \
+                           'Check the log file for more info. Maybe try with different countries?'
+
+
+MIN_COUNTRIES = 1
+MAX_COUNTRIES = 5
+
+
+def Select_Country_Message(i: int) -> str:
+	return f'Please enter the name of country {i + 1} you wish to compare: '
+
+
+# LOGGING SETTINGS
 LOGGING_CONFIG = '%(asctime)-15s %(name)s %(levelname)s %(message)s'
 
 

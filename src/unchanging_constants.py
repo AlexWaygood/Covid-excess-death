@@ -26,6 +26,9 @@ X_AXIS = 'x'
 Y_AXIS = 'y'
 FRAMEALPHA = 'legend.framealpha'
 FACECOLOR = 'figure.facecolor'
+WEB_APP = 'web'
+DESKTOP_APP = 'desktop'
+YES = 'yes'
 
 
 STRING_LIST = List[str]
