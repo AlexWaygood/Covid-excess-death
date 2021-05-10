@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Pandemic excess deaths: interactive web viewer</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    </head>
+
+    <body><div id="page container">
+
+        <div id="content wrap">
+
+            <header>
+                <div class='container'>
+                    <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
+                </div>
+            </header>
+
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+        </div>
+
+        <footer id="footer"><p>
+
+            {% if plotter.GraphStage == 2 %}
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            {% endif %}
+
+            <a href="http://alexwaygood.com">© Alex Waygood 2021</a>
+
+            {% if plotter.GraphStage == 2 %}
+                <br><br>
+            {% endif %}
+
+        </p></footer>
+
+    </div></body>
+
+</html>

@@ -82,8 +82,6 @@ def MergeDataFrames(
 
 def FillMissingDataValuesForOneCountry(data: DataFrame) -> DataFrame:
     if st.FILL_MISSING_DATA_METHOD == uc.INTERPOLATE:
-        if st.INTERPOLATE_METHOD in (uc.SPLINE, uc.POLYNOMIAL):
-            return data.interpolate(method=st.INTERPOLATE_METHOD, order=st.INTERPOLATE_ORDER)
         return data.interpolate(method=st.INTERPOLATE_METHOD)
     if st.FILL_MISSING_DATA_METHOD == uc.FFILL:
         return data.fillna(uc.FFILL)

@@ -5,7 +5,6 @@ from pyinputplus import inputInt, inputCustom
 from traceback_with_variables import iter_exc_lines
 from src.unchanging_constants import STRING_LIST
 import src.settings as st
-from src.data_wrangling import WrangleData
 from src.graph_plotting import GraphPlotter, PlotAsGraph
 from src.user_input import AskIfTheyWantTheListOfCountries, ValidateRepeatQuestionAnswer, RepeatQuestionText
 from typing import NoReturn
@@ -58,7 +57,15 @@ class DesktopGraphPlotter(GraphPlotter):
         try:
             AskIfTheyWantTheListOfCountries(self.FT_Countries)
             CountriesToCompare = self.GetCountryNames()
-            PlotAsGraph(*WrangleData(self.FT_data, CountriesToCompare), SaveFile=SaveFile, GUIUsage=GUIUsage)
+
+            PlotAsGraph(
+                self.FT_data,
+                CountriesToCompare,
+                st.GraphTitle(CountriesToCompare),
+                SaveFile=SaveFile,
+                GUIUsage=GUIUsage
+            )
+
         except:
             Traceback = '\n'.join(iter_exc_lines())
             logging.error(f"Exception!\n\n{Traceback}\n\n")
@@ -70,3 +77,11 @@ class DesktopGraphPlotter(GraphPlotter):
             inputCustom(self.ValidateCountryName, st.Select_Country_Message(i))
             for i in range(inputInt(st.HOW_MANY_COUNTRIES_MESSAGE))
         ]
+
+    def ValidateCountryName(self, CountryName: str) -> str:
+        if CountryName not in self.FT_Countries:
+            raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
+        return CountryName
+
+
+DesktopGraphPlotter().Run(GUIUsage=True)

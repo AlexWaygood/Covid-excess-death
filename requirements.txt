@@ -15,7 +15,8 @@ Flask==1.1.2
 idna==2.10
 ipinfo==4.0.0
 kiwisolver==1.2.0
-matplotlib==3.1.1
+matplotlib==3.3.1
+mpld3==0.5.1
 multidict==5.0.0
 numpy==1.20.2
 oauthlib==3.1.0

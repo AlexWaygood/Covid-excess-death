@@ -1,11 +1,12 @@
 import src.unchanging_constants as uc
 import src.settings as st
+from src.data_wrangling import WrangleData
 from pandas import DataFrame, read_csv
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 from os import path
 from datetime import datetime
-from typing import Any
+from itertools import chain
 
 
 rcParams[uc.FRAMEALPHA] = st.LEGEND_OPACITY
@@ -21,12 +22,7 @@ class GraphPlotter:
 
     def __init__(self) -> None:
         self.FT_data = FetchFTData()
-        self.FT_Countries = set(self.FT_data.country.to_list())
-
-    def ValidateCountryName(self, CountryName: str) -> str:
-        if CountryName not in self.FT_Countries:
-            raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
-        return CountryName
+        self.FT_Countries = sorted(list(set(self.FT_data.country.to_list())))
 
 
 def PNGFilePath() -> str:
@@ -37,18 +33,21 @@ def PNGFilePath() -> str:
 
 
 def PlotAsGraph(
-        data: DataFrame,
-        StartDate: str,
+        FT_data: DataFrame,
+        countries: uc.STRING_LIST,
+        Title: str,
         GUIUsage: bool = False,
         SaveFile: bool = False,
         ReturnImage: bool = False
-) -> Any:
+) -> uc.OPTIONAL_STR:
 
-    ax = data.plot(figsize=(st.FIGURE_WIDTH, st.FIGURE_HEIGHT))
+    data, StartDate = WrangleData(FT_data, countries)
+    fig, ax = plt.subplots(figsize=(st.FIGURE_WIDTH, st.FIGURE_HEIGHT))
+    ax = data.plot(ax=ax)
     ax.set_facecolor(st.BACKGROUND_COLOUR)
 
     plt.suptitle(
-        st.GRAPH_TITLE,
+        Title,
         size=st.TITLE_SIZE,
         fontfamily=st.TITLE_FONT,
         color=st.TITLE_COLOUR,
@@ -62,7 +61,7 @@ def PlotAsGraph(
         fontfamily=st.SUB_TITLE_FONT
     )
 
-    for i in st.HORIZONTAL_LINE_POSITIONS:
+    for i in chain(range(0, int(max(data.max())), 50), range(0, int(min(data.min())), -50)):
         plt.hlines(
             i,
             StartDate,
@@ -107,8 +106,8 @@ def PlotAsGraph(
 
     if ReturnImage:
         from io import BytesIO
-        from flask import send_file
+        from base64 import b64encode
         buf = BytesIO()
-        plt.savefig(buf)
+        plt.savefig(buf, format='png')
         buf.seek(0)
-        return send_file(buf, mimetype='image/png')
+        return b64encode(buf.getvalue()).decode('ascii')

@@ -1,5 +1,5 @@
 from os import path
-from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, INTERPOLATE, SPLINE
+from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, INTERPOLATE, CUBIC, LINEAR, STRING_LIST
 from datetime import datetime
 
 """Settings for the whole project"""
@@ -63,7 +63,19 @@ GRAPH_TOP = 0.8
 GRAPH_BOTTOM = 0.2
 
 # TITLE SETTINGS
-GRAPH_TITLE = 'Pandemic Excess Deaths'
+
+COUNTRIES_WHICH_NEED_ARTICLE = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
+
+
+def AddArticle(country: str) -> str:
+	return f'the {country}' if country in COUNTRIES_WHICH_NEED_ARTICLE else country
+
+
+def GraphTitle(Countries: STRING_LIST) -> str:
+	Countries = list(map(AddArticle, Countries))
+	return f'Pandemic excess deaths in {", ".join(Countries[:-1])} and {Countries[-1]}'
+
+
 GRAPH_TITLE_POSITION = 0.93
 TITLE_SIZE = 'xx-large'
 TITLE_FONT = STANDARD_FONT
@@ -89,7 +101,6 @@ FT_DATA_TYPES = {WEEK: float, EXPECTED_DEATHS: float, EXCESS_DEATHS: float, DATE
 HORIZONTAL_LINE_COLOUR = 'silver'
 HORIZONTAL_LINE_WIDTH = 1
 HORIZONTAL_LINE_STYLE = 'dashed'
-HORIZONTAL_LINE_POSITIONS = (0, 50, 100)
 
 # COPYRIGHT LABEL SETTINGS
 COPYRIGHT_LABEL = 'Data from the Financial Times | Graph © Alex Waygood'
@@ -105,7 +116,7 @@ COPYRIGHT_LABEL_PADDING_FROM_X_AXIS = 25
 FILL_MISSING_DATA_METHOD = INTERPOLATE
 
 # only relevant if FILL_MISSING_DATA_METHOD is INTERPOLATE
-INTERPOLATE_METHOD = SPLINE
+# Should be CUBIC or LINEAR
+INTERPOLATE_METHOD = CUBIC
 
-# only relevant if INTERPOLATE_METHOD is SPLINE or POLYNOMIAL. Needs to be in range 1 <= x <= 5.
-INTERPOLATE_ORDER = 2
+

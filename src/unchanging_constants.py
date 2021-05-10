@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Optional, Tuple
 from pandas import DataFrame
 
 """Magic numbers and strings that don't need to be changed."""
 
 FFILL = 'ffill'
 INTERPOLATE = 'interpolate'
-SPLINE = 'spline'
-POLYNOMIAL = 'polynomial'
+CUBIC = 'cubic'
+LINEAR = 'linear'
 WEEK = 'week'
 MONTH = 'month'
 EXPECTED_DEATHS = 'expected_deaths'
@@ -31,5 +31,7 @@ DESKTOP_APP = 'desktop'
 YES = 'yes'
 
 
+OPTIONAL_STR = Optional[str]
 STRING_LIST = List[str]
 DATA_FRAME_LIST = List[DataFrame]
+IMAGE_AND_TITLE = Tuple[str, str]
