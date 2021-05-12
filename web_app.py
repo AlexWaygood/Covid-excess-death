@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 from typing import Optional, Tuple
 from threading import Thread
-from src.web_app import WebGraphPlotter
+from src.web_graph_plotting import WebGraphPlotter
 
 
 app = Flask(__name__)
