@@ -1,21 +1,16 @@
-html {min-height: 100vh}
-
-page-container {
-  position: relative;
-  min-height: 100vh;
-}
-
-content-wrap {
-  padding-bottom: 3.5rem;    /* Footer height */
+@font-face {
+  font-family: Playfair-Display;
+  src: url('PlayfairDisplay-VariableFont_wght.ttf');
 }
 
 footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 2.5rem;            /* Footer height */
+  height: 25px;            /* Footer height */
   text-align: center;
-  text-decoration: underline
+  text-decoration: underline;
+  z-index:-1;
 }
 
 header {
@@ -23,7 +18,7 @@ header {
   position: absolute;
   left: 0;
   right: 0;
-  width: 100%;
+  width: 1350px;
   opacity: .9;
 }
 
@@ -35,28 +30,43 @@ header a {
   text-decoration: none;
 }
 
-.container {
+.HeaderContainer {
   width: 1200px;
-  margin: 10px;
+  margin-left: 20px;
 }
 
-div.home {
-  position: absolute;
+.BlockContent {
   left: 10px;
-  top: 90px;
+  top: 70px;
   right: 0
 }
 
-div.data_viewer {
-  position: absolute;
-  left: 10px;
-  top: 90px;
-  right: 0
+.HomeBlock {
+  padding: 20px 0px
 }
 
-h2 {
-  font-size: 1.1em;
-  text-align: left;
+.CenteredContent {
+  position: absolute;
+  left: 25%;
+  top: 70px;
+  right: 25%;
+  color: #222;
+  font-family: Playfair-Display;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+}
+
+.CenteredContent p {
+  line-height: 1.8em
+}
+
+.FromRedirect h2 {
+  font-size: 1.5em;
+}
+
+.Centred {
+  text-align: center;
+  align: center
 }
 
 .button {
@@ -89,6 +99,7 @@ img {
   display: block;
   margin-left: 50px;
   margin-right: 50px;
+  margin-top: 100px;
   font: bold 24px Times New Roman;
   text-weight: bold;
   color: #333333;
@@ -105,17 +116,13 @@ img {
   text-weight: bold;
   text-align: center;
   align: center;
+  position: relative;
 }
 
 .CentreAlignedToParent {
-  left: 50%;
   position: absolute;
+  left: 50%;
   transform: translate(-50%, 0);
-}
-
-.NumberSelection {
-  position: relative;
-  width: 430px;
 }
 
 .HowManyCountriesForm {
@@ -123,6 +130,8 @@ img {
 }
 
 .HowManyCountriesForm table {
+  display: block;
+  justify-content: center;
   width: 250px;
 }
 
@@ -134,30 +143,99 @@ img {
   width: 60px;
 }
 
-.RandomGraph {
-  position: relative;
-  top: 150px;
-  width: 420px
+.RadioButton {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 4px inset #999;
+  opacity: 0.5;
+  transition: 0.2s all linear;
+  margin-right: 5px;
+  color: #eee;
+  border-radius: 50%;
+  height: 20px;
+  width: 20px;
+  will-change: border, opacity;
+}
+
+.RadioButton:checked {
+  border: 4px inset DarkGoldenRod;
+  opacity: 1;
+}
+
+.RadioButton:hover {
+  opacity: 1;
+  border: 4px solid silver;
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  transform: scale(1.2);
 }
 
 .selectbutton {
   font-size: 0.9em;
 }
 
-.MakeGraphButton {
-  font-size: 1.03em;
+.CountryTable {
+  width: 800px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.CountryTable tr {
+  height: 50px;
+  font-size: 0.95em;
+}
+
+.filledcell td {
+  width: 500px;
 }
 
 .emptycell {
   width: 10px
 }
 
-.CountryTable tr {
-  height: 50px
+.MakeGraphButton {
+  font-size: 0.95em;
+  display: inline-block;
 }
 
-.MakeGraphButtons td {
+.MakeGraphButtonsTable {
+  margin-top: 60px;
+  display: flex;
+  justify-content: center
+}
+
+.MakeGraphButtonsTable td {
   position: relative;
-  left: 100px;
+  text-align: center;
+  margin-left: 100px;
+  margin-right: 100px;
   width: 200px;
+}
+
+hr {
+  border-top: 2px groove DarkGoldenRod;
+}
+
+.menu {
+  float: right;
+  margin-top: 8px;
+  position: relative;
+  right: -50px;
+}
+
+.menu li {
+  position: relative;
+  display: inline-block;
+  padding: 2px 10px
+}
+
+
+.menu li a {
+  color: #444;
+  text-decoration: none;
+}
+
+.AboutPage p {
+  margin-bottom: 60px
 }

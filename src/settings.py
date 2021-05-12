@@ -73,7 +73,8 @@ def AddArticle(country: str) -> str:
 
 def GraphTitle(Countries: STRING_LIST) -> str:
 	Countries = list(map(AddArticle, Countries))
-	return f'Pandemic excess deaths in {", ".join(Countries[:-1])} and {Countries[-1]}'
+	Countries = Countries[0] if len(Countries) == 1 else f'{", ".join(Countries[:-1])} and {Countries[-1]}'
+	return f'Pandemic excess deaths in {Countries}'
 
 
 GRAPH_TITLE_POSITION = 0.93
@@ -101,6 +102,11 @@ FT_DATA_TYPES = {WEEK: float, EXPECTED_DEATHS: float, EXCESS_DEATHS: float, DATE
 HORIZONTAL_LINE_COLOUR = 'silver'
 HORIZONTAL_LINE_WIDTH = 1
 HORIZONTAL_LINE_STYLE = 'dashed'
+HORIZONTAL_LINE_INCREMENT = 50
+
+X_AXIS_LINE_SYTLE = HORIZONTAL_LINE_STYLE
+X_AXIS_COLOUR = 'grey'
+X_AXIS_WIDTH = 1.3
 
 # COPYRIGHT LABEL SETTINGS
 COPYRIGHT_LABEL = 'Data from the Financial Times | Graph © Alex Waygood'

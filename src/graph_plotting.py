@@ -61,15 +61,22 @@ def PlotAsGraph(
         fontfamily=st.SUB_TITLE_FONT
     )
 
-    for i in chain(range(0, int(max(data.max())), 50), range(0, int(min(data.min())), -50)):
-        plt.hlines(
-            i,
-            StartDate,
-            st.END_DATE,
-            colors=st.HORIZONTAL_LINE_COLOUR,
-            linestyles=st.HORIZONTAL_LINE_STYLE,
-            linewidths=st.HORIZONTAL_LINE_WIDTH
-        )
+    PosLines = range(0, int(max(data.max())), st.HORIZONTAL_LINE_INCREMENT)
+    NegLines = range(0, int(min(data.min())), -st.HORIZONTAL_LINE_INCREMENT)
+    colour, style, width = st.HORIZONTAL_LINE_COLOUR, st.HORIZONTAL_LINE_STYLE, st.HORIZONTAL_LINE_WIDTH
+
+    for i in chain(PosLines, NegLines):
+        if i:
+            plt.hlines(i, StartDate, st.END_DATE, colors=colour, linestyles=style, linewidths=width)
+
+    plt.hlines(
+        0,
+        StartDate,
+        st.END_DATE,
+        colors=st.X_AXIS_COLOUR,
+        linestyles=st.X_AXIS_LINE_SYTLE,
+        linewidths=st.X_AXIS_WIDTH
+    )
 
     plt.subplots_adjust(top=st.GRAPH_TOP, bottom=st.GRAPH_BOTTOM)
 

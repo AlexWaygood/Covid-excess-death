@@ -5,39 +5,49 @@
         <meta charset="UTF-8">
         <title>Pandemic excess deaths: interactive web viewer</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='coronavirus (2).ico') }}">
     </head>
 
-    <body><div id="page container">
+    <body><div class="page-container">
+        <div class="content-wrap">
 
-        <div id="content wrap">
+            <header><div class='HeaderContainer'>
+                <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
 
-            <header>
-                <div class='container'>
-                    <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
-                </div>
-            </header>
+                <nav><ul class="menu">
+                    <li><a href="{{ url_for('home') }}">Home</a></li>
+                    <li><a href="{{ url_for('about') }}">About</a></li>
+                </ul></nav>
 
-            <div class="container">
+            </div></header>
+
+            <div class="LayoutContainer">
                 {% block content %}
                 {% endblock %}
             </div>
 
         </div>
+    </div>
 
-        <footer id="footer"><p>
+    <footer id="footer"><p>
 
-            {% if plotter.GraphStage == 2 %}
-                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-            {% endif %}
+        {% if plotter.GraphStage == 2 %}
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        {% elif AboutPage %}
+            {% for _ in range(6) %}
+                 <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            {% endfor %}
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        {% endif %}
 
-            <a href="http://alexwaygood.com">© Alex Waygood 2021</a>
+        <a href="http://alexwaygood.com">© Alex Waygood 2021</a>
 
-            {% if plotter.GraphStage == 2 %}
-                <br><br>
-            {% endif %}
+        {% if plotter.GraphStage == 2 or AboutPage %}
+            <br><br>
+        {% endif %}
 
-        </p></footer>
+    </p></footer>
 
-    </div></body>
+    </body>
 
 </html>
