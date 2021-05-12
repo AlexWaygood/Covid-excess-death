@@ -40,5 +40,10 @@ def page_not_found(e) -> Tuple[str, int]:
     return render_template('404.html', plotter=plotter.Reset(), AboutPage=False), 404
 
 
+@app.errorhandler(500)
+def ServerError(e) -> Tuple[str, int]:
+    return render_template('500.html', plotter=plotter.Reset(), AboutPage=False), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)

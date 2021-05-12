@@ -153,15 +153,8 @@ class WebGraphPlotter(GraphPlotter):
 		self._IncorrectEntry = value
 
 	def Reset(self: T) -> T:
-		self.CountryNumber = 0
-		self.GraphStage = 0
-		self.img = ''
-		self.ImageTitle = ''
-		self.InputBoxes = ['']
-		self.Message1 = ''
-		self.Message2 = ''
-		self.Message3 = ''
-		self.IncorrectEntry = False
+		self.__init__()
+		self.Initialised = True
 		return self
 
 	def Update(
@@ -198,7 +191,13 @@ class WebGraphPlotter(GraphPlotter):
 			self.IncorrectEntry = False
 
 			if CountryNumber == 'random':
-				self.GraphAndTitle(random_sample(self.FT_Countries, randint(2, 5)))
+				while True:
+					# noinspection PyBroadException
+					try:
+						self.GraphAndTitle(random_sample(self.FT_Countries, randint(1, 5)))
+						break
+					except:
+						pass
 			else:
 				try:
 					assert float(CountryNumber).is_integer()

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% extends "layout.html" %}
+    {% block title %}Internal Server Error{% endblock %}
+
+    {% block content %}
+        <div class="BlockContent CentreAlignedToParent Centred">
+            <h1><br><br>Hmm, looks like there was a server error here :(</h1>
+            <p>The server probably had difficulty making a graph with one or more of your country selections.</p>
+            <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
+                <td><a href="/dataviewer/" class="button MakeGraphButton CentreAlignedToParent">Make a graph</a></td>
+                <td><a href="/" class="button MakeGraphButton CentreAlignedToParent">Head home</a></td>
+            </tr></table>
+
+        </div>
+    {% endblock %}
+
+</html>

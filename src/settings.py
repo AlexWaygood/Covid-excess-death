@@ -1,6 +1,7 @@
 from os import path
 from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, INTERPOLATE, CUBIC, LINEAR, STRING_LIST
 from datetime import datetime
+from matplotlib.font_manager import FontProperties
 
 """Settings for the whole project"""
 
@@ -39,16 +40,17 @@ LOGGING_CONFIG = '%(asctime)-15s %(name)s %(levelname)s %(message)s'
 
 
 def LogFileName() -> str:
-	return path.join('..', 'error_logs', f"Covid graph error log - {datetime.now().strftime('%Y-%m-%d')}.txt")
+	return path.join('error_logs', f"Covid graph error log - {datetime.now().strftime('%Y-%m-%d')}.txt")
 
 
 # GENERAL GRAPH SETTINGS
 BACKGROUND_COLOUR = '#fdffd4'
 STANDARD_TEXT_COLOUR = '#747564'
-STANDARD_FONT = 'Times New Roman'
+PATH_TO_STANDARD_FONT = path.join('static', 'PlayfairDisplay-VariableFont_wght.ttf')
+STANDARD_FONT = FontProperties(fname=PATH_TO_STANDARD_FONT)
 
 # GRAPH EXPORT SETTINGS
-EXPORT_FILE_PATH = path.join('..', 'graph_images')
+EXPORT_FILE_PATH = path.join('graph_images')
 EXPORT_FILE_TYPE = 'png'
 
 # AXES SETTINGS

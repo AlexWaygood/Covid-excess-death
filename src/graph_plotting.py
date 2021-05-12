@@ -49,7 +49,7 @@ def PlotAsGraph(
     plt.suptitle(
         Title,
         size=st.TITLE_SIZE,
-        fontfamily=st.TITLE_FONT,
+        fontproperties=st.TITLE_FONT,
         color=st.TITLE_COLOUR,
         y=st.GRAPH_TITLE_POSITION
     )
@@ -58,7 +58,7 @@ def PlotAsGraph(
         st.SUB_TITLE,
         pad=st.SUB_TITLE_PADDING_FROM_GRAPH,
         color=st.SUB_TITLE_COLOUR,
-        fontfamily=st.SUB_TITLE_FONT
+        fontproperties=st.SUB_TITLE_FONT
     )
 
     PosLines = range(0, int(max(data.max())), st.HORIZONTAL_LINE_INCREMENT)
@@ -82,7 +82,7 @@ def PlotAsGraph(
 
     plt.xlabel(
         st.COPYRIGHT_LABEL,
-        fontfamily=st.COPYRIGHT_LABEL_FONT,
+        fontproperties=st.COPYRIGHT_LABEL_FONT,
         color=st.COPYRIGHT_LABEL_COLOUR,
         labelpad=st.COPYRIGHT_LABEL_PADDING_FROM_X_AXIS
     )
@@ -97,13 +97,13 @@ def PlotAsGraph(
 
     ax.tick_params(axis=uc.X_AXIS, which=uc.BOTH, colors=st.AXIS_TICK_COLOUR)
 
-    plt.yticks(fontname=st.AXIS_FONT)
-    plt.xticks(fontname=st.AXIS_FONT)
+    plt.yticks(fontfamily='serif')
+    plt.xticks(fontfamily='serif')
 
     for s in (uc.TOP, uc.RIGHT, uc.LEFT, uc.BOTTOM):
         ax.spines[s].set_visible(False)
 
-    plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontfamily=st.LEGEND_FONT)
+    plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontproperties=st.LEGEND_FONT)
 
     if SaveFile:
         plt.savefig(PNGFilePath())
