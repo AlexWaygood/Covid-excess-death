@@ -1,6 +1,6 @@
 # Covid excess deaths
 
-Use the web app here: http://covid-excess-deaths.ew.r.appspot.com/.
+Use the web app here: http://covid-excess-deaths.ew.r.appspot.com/ (main.py).
 
 Alternatively, run on your desktop by running desktop_app.py.
 
