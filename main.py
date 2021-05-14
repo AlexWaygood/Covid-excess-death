@@ -1,6 +1,5 @@
 from flask import Flask, render_template
 from typing import Optional, Tuple
-from threading import Thread
 from src.web_graph_plotting import WebGraphPlotter
 
 
@@ -12,7 +11,6 @@ plotter: Optional[WebGraphPlotter] = None
 def InitialiseManager() -> None:
     global plotter
     plotter = WebGraphPlotter()
-    Thread(target=plotter.Initialise).start()
 
 
 @app.route('/')
@@ -47,3 +45,5 @@ def ServerError(e) -> Tuple[str, int]:
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+#  $('#loading').show();$('#content').hide();document.body.style.cursor = 'wait';

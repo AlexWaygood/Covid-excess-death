@@ -7,6 +7,7 @@ from src.unchanging_constants import STRING_LIST
 from random import randint, sample as random_sample
 from flask import request
 from time import sleep
+from threading import Thread
 
 if TYPE_CHECKING:
 	from pandas import DataFrame
@@ -121,12 +122,18 @@ class InputBox:
 		self.index = f'Country{index}'
 
 
+# noinspection PyAttributeOutsideInit
 class WebGraphPlotter(GraphPlotter):
 	__slots__ = 'CountryNumber', 'img', 'ImageTitle', 'InputBoxes', 'GraphStage', 'Message1', 'Message2', 'Message3', \
 	            '_IncorrectEntry', 'Initialised'
 
 	# noinspection PyMissingConstructor
 	def __init__(self) -> None:
+		self.Reset()
+		self.Initialised = False
+		Thread(target=self.Initialise).start()
+
+	def Reset(self: T) -> T:
 		self.CountryNumber = 0
 		self.img = ''
 		self.ImageTitle = ''
@@ -136,7 +143,7 @@ class WebGraphPlotter(GraphPlotter):
 		self.Message2 = ''
 		self.Message3 = ''
 		self._IncorrectEntry = False
-		self.Initialised = False
+		return self
 
 	def Initialise(self) -> None:
 		super().__init__()
@@ -152,18 +159,14 @@ class WebGraphPlotter(GraphPlotter):
 	def IncorrectEntry(self, value: bool) -> None:
 		self._IncorrectEntry = value
 
-	def Reset(self: T) -> T:
-		self.__init__()
-		self.Initialised = True
-		return self
+	def WaitForData(self) -> None:
+		while not self.Initialised:
+			sleep(0.1)
 
 	def Update(
 			self: T,
 			FromRedirect: bool
 	) -> T:
-
-		while not self.Initialised:
-			sleep(0.1)
 
 		if FromRedirect:
 			return self
@@ -171,13 +174,15 @@ class WebGraphPlotter(GraphPlotter):
 		self.ImageTitle = ''
 		self.img = ''
 
-		if request.args.get('Country0'):
-			self.CountryNumber = 1
+		if Country0 := request.args.get('Country0'):
+			self.CountryNumber, countries = 1, [Country0]
 
-			while self.CountryNumber < 5 and bool(request.args.get(f'Country{self.CountryNumber}')):
+			while self.CountryNumber < 5 and bool(country := (request.args.get(f'Country{self.CountryNumber}'))):
 				self.CountryNumber += 1
+				# noinspection PyUnboundLocalVariable
+				countries.append(country)
 
-			countries = [request.args.get(f'Country{i}') for i in range(self.CountryNumber)]
+			self.WaitForData()
 
 			if not all((c in self.FT_Countries) for c in countries):
 				self.GraphStage = 0
@@ -191,6 +196,8 @@ class WebGraphPlotter(GraphPlotter):
 			self.IncorrectEntry = False
 
 			if CountryNumber == 'random':
+				self.WaitForData()
+
 				while True:
 					# noinspection PyBroadException
 					try:
@@ -216,6 +223,7 @@ class WebGraphPlotter(GraphPlotter):
 
 		if self.CountryNumber:
 			self.InputBoxes = [InputBox(i, self.CountryNumber) for i in range(self.CountryNumber)]
+			self.WaitForData()
 		else:
 			self.InputBoxes = ['']
 

@@ -88,13 +88,6 @@ header a {
   background-color: #D1CFCF;
 }
 
-img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  border: 2px solid Gainsboro
-}
-
 .GraphMessageTitle {
   display: block;
   margin-left: 50px;
@@ -117,6 +110,13 @@ img {
   text-align: center;
   align: center;
   position: relative;
+}
+
+.GraphMessageBody img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: 2px solid Gainsboro
 }
 
 .CentreAlignedToParent {
@@ -239,3 +239,12 @@ hr {
 .AboutPage p {
   margin-bottom: 60px
 }
+
+.loading {
+    width: 2000px;
+    height: 1000px;
+    display: none;
+    text-align: center;
+    text-weight: bold;
+    font: bold 22px Playfair-Display
+    }

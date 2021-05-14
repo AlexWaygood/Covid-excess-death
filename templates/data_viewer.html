@@ -7,108 +7,131 @@
     <div class="{{'CenteredContent' if plotter.GraphStage < 2 else 'BlockContent'}}">
         <br>
 
-        {% if plotter.GraphStage == 0 %}
-
-            {% if FromRedirect %}
-                <div class="FromRedirect">
-                    <h2 class="Centred">It looks like you made a mistake when entering a URL!</h2>
-
-                    <p class="Centred">
-                        You either entered an invalid number of countries,
-                        or tried to enter a country that isn't in the FT's dataset.<br>
-                        Either enter the URL again, or complete the form manually here.<br><br>
-                    <hr>
-                    <br>
-
-                </div>
-            {% endif %}
-
-
-            <p class="Centred">To make a custom graph, please specify how many countries you want to compare:</p>
-
-            <form action="" method="get" class="HowManyCountriesForm CentreAlignedToParent"><table>
-
-                <tr>
-                    {% for i in range(1, 6) %}
-                        <td>
-                            <input type="radio" id={{i}} name="HowManyCountries" value={{i}} class="RadioButton">
-                        </td>
-                    {% endfor %}
-                </tr>
-
-                <tr>
-                    {% for i in range(1, 6) %}
-                        <td>
-                            <label for={{i}}>{{i}}</label>
-                        </td>
-                    {% endfor %}
-                </tr>
-
-                </table>
-
-                <p>
-                    <input type="submit" value="Submit" class="button">
-                </p>
-
-            </form>
-
-            <p class="Centred">
-                <br><br><br><br><br><br>
-                Alternatively, click the button below to generate a random graph!
+        <div id="loading" class="loading CentreAlignedToParent">
+            <p class="CentreAlignedToParent">
+                <br><br><br>
+                <img
+                        class="CentreAlignedToParent"
+                        src="{{ url_for('static', filename='images/loading.gif') }}"
+                        alt="Loading..." title="Please wait..."
+                />
                 <br><br>
-
-
-            <a
-                    href="/dataviewer/?HowManyCountries=random"
-                    class="button CentreAlignedToParent"
-                    onclick="document.body.style.cursor='wait'; return true;"
-            >
-                Generate random graph
-            </a>
-
+                Loading, please wait...
             </p>
+        </div>
 
-        {% elif plotter.GraphStage == 1 %}
-            <form action="" method="get" class="CentreAlignedWithParent">
-                <table class="CountryTable CentreAlignedWithParent">
+        {% if plotter.GraphStage == 0 %}
+            <div class="content">
 
-                    {% for box in plotter.InputBoxes %}
+                {% if FromRedirect %}
+                    <div class="FromRedirect">
+                        <h2 class="Centred">It looks like you made a mistake when entering a URL!</h2>
+
+                        <p class="Centred">
+                            You either entered an invalid number of countries,
+                            or tried to enter a country that isn't in the FT's dataset.<br>
+                            Either enter the URL again, or complete the form manually here.<br><br>
+                        <hr>
+                        <br>
+
+                    </div>
+                {% endif %}
+
+                <p class="Centred">To make a custom graph, please specify how many countries you want to compare:</p>
+
+                <form action="" method="get" class="HowManyCountriesForm CentreAlignedToParent" onsubmit="WhileLoading()">
+
+                    <table>
+
                         <tr>
-                            <td class="filledcell" align="left">{{box.label}}:</td>
-                            <td class="emptycell"></td>
-                            <td align="left" class="filledcell">
-
-                                <select
-                                        class="button selectbutton"
-                                        name={{box.index}}
-                                        required
-                                        autocomplete="off"
-                                        title="{{box.label}}"
-                                        oninvalid="this.setCustomValidity('{{box.label}}, or go back a step to change the number of countries in your graph')"
-                                        oninput="this.setCustomValidity('')"
-                                >
-
-                                    <option value="" disabled selected hidden>--Please select a country--</option>
-
-                                    {% for country in plotter.FT_Countries %}
-                                        <option value="{{country}}">{{country}}</option>
-                                    {% endfor %}
-
-                                </select>
-                            </td>
+                            {% for i in range(1, 6) %}
+                                <td>
+                                    <input type="radio" id={{i}} name="HowManyCountries" value={{i}} class="RadioButton">
+                                </td>
+                            {% endfor %}
                         </tr>
 
-                    {% endfor %}
+                        <tr>
+                            {% for i in range(1, 6) %}
+                                <td>
+                                    <label for={{i}}>{{i}}</label>
+                                </td>
+                            {% endfor %}
+                        </tr>
+
                     </table>
 
-                    <p></p>
+                    <p><input type="submit" value="Submit" class="button"></p>
 
-                    <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
-                        <td><input type="submit" class="button MakeGraphButton CentreAlignedWithParent" value="Generate my graph!"></td>
-                        <td><a href="/dataviewer/" class="button MakeGraphButton CentreAlignedWithParent">Go back one step</a></td>
-                    </tr></table>
+                </form>
 
-            </form>
+                <p class="Centred">
+
+                    <br><br><br><br><br><br>
+                    Alternatively, click the button below to generate a random graph!
+                    <br><br>
+
+                    <a
+                            href="/dataviewer/?HowManyCountries=random"
+                            class="button CentreAlignedToParent"
+                            onclick="WhileLoading()"
+                    >
+                        Generate random graph
+                    </a>
+
+                </p>
+
+            </div>
+
+        {% elif plotter.GraphStage == 1 %}
+            <div class="content">
+                <form action="" method="get" class="CentreAlignedWithParent" onsubmit="WhileLoading()">
+                    <table class="CountryTable CentreAlignedWithParent">
+
+                        {% for box in plotter.InputBoxes %}
+                            <tr>
+                                <td class="filledcell" align="left">{{box.label}}:</td>
+                                <td class="emptycell"></td>
+                                <td align="left" class="filledcell">
+
+                                    <select
+                                            class="button selectbutton"
+                                            name={{box.index}}
+                                            required
+                                            autocomplete="off"
+                                            title="{{box.label}}"
+                                            oninvalid="this.setCustomValidity('{{box.label}}, or go back a step to change the number of countries in your graph')"
+                                            oninput="this.setCustomValidity('')"
+                                    >
+
+                                        <option value="" disabled selected hidden>--Please select a country--</option>
+
+                                        {% for country in plotter.FT_Countries %}
+                                            <option value="{{country}}">{{country}}</option>
+                                        {% endfor %}
+
+                                    </select>
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+                        </table>
+
+                        <p></p>
+
+                        <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
+                            <td>
+                                <input
+                                        type="submit"
+                                        class="button MakeGraphButton CentreAlignedWithParent"
+                                        value="Generate my graph!"
+                                >
+                            </td>
+                            <td><a href="/dataviewer/" class="button MakeGraphButton CentreAlignedWithParent">Go back one step</a></td>
+                        </tr></table>
+
+                </form>
+            </div>
 
         {% else %}
             <p class="GraphMessageTitle">{{plotter.Message1}}<br><br></p>
@@ -125,7 +148,6 @@
             </p>
 
             <a href="/dataviewer/" class="button MakeGraphButton CentreAlignedToParent">Make another graph</a>
-
         {% endif %}
     </div>
 
