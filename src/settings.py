@@ -29,12 +29,20 @@ UNEXPECTED_ERROR_MESSAGE = 'Looks like there was an error here! ' \
 
 MIN_COUNTRIES = 1
 MAX_COUNTRIES = 5
+ORDINALS = ('first', 'second', 'third', 'fourth', 'fifth')
 
 
-def Select_Country_Message(i: int) -> str:
-    if i == 1:
-        return 'Please enter the name of the country you wish to view: '
-    return f'Please enter the name of country {i + 1} you wish to compare: '
+def Select_Country_Message(
+        i: int,
+        CountryNumber: int,
+        DesktopUsage: bool
+) -> str:
+
+    VERB = 'enter the name of' if DesktopUsage else 'select'
+
+    if CountryNumber == 1:
+        return f'Please {VERB} the country you would like to graph'
+    return f'Please {VERB} the {ORDINALS[i]} country you would like to compare'
 
 
 def Desktop_Error_Message(Traceback: str) -> str:

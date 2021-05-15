@@ -5,6 +5,8 @@ from pandas import DataFrame, read_csv
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 from itertools import chain
+from random import randint, sample as random_sample
+from abc import ABC, abstractmethod
 
 
 rcParams[uc.FRAMEALPHA] = st.LEGEND_OPACITY
@@ -15,12 +17,28 @@ def FetchFTData() -> DataFrame:
     return read_csv(st.FT_DATA_URL, dtype=st.FT_DATA_TYPES, parse_dates=[uc.DATE, ])
 
 
-class GraphPlotter:
+class GraphPlotter(ABC):
     __slots__ =  'FT_data', 'FT_Countries'
 
     def __init__(self) -> None:
         self.FT_data = FetchFTData()
         self.FT_Countries = sorted(list(set(self.FT_data.country.to_list())))
+
+    def RandomCountries(self) -> uc.STRING_LIST:
+        return random_sample(self.FT_Countries, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
+
+    @abstractmethod
+    def RandomGraph(self, **kwargs) -> None:
+        pass
+
+    def RandomGraphLoop(self, **kwargs) -> None:
+        while True:
+            # noinspection PyBroadException
+            try:
+                self.RandomGraph(**kwargs)
+                break
+            except:
+                pass
 
 
 def PlotAsGraph(
@@ -56,9 +74,8 @@ def PlotAsGraph(
     NegLines = range(0, int(min(data.min())), -st.HORIZONTAL_LINE_INCREMENT)
     colour, style, width = st.HORIZONTAL_LINE_COLOUR, st.HORIZONTAL_LINE_STYLE, st.HORIZONTAL_LINE_WIDTH
 
-    for i in chain(PosLines, NegLines):
-        if i:
-            plt.hlines(i, StartDate, st.END_DATE, colors=colour, linestyles=style, linewidths=width)
+    for i in filter(lambda x: x, chain(PosLines, NegLines)):
+        plt.hlines(i, StartDate, st.END_DATE, colors=colour, linestyles=style, linewidths=width)
 
     plt.hlines(
         0,
@@ -94,7 +111,10 @@ def PlotAsGraph(
     for s in (uc.TOP, uc.RIGHT, uc.LEFT, uc.BOTTOM):
         ax.spines[s].set_visible(False)
 
-    plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontproperties=st.LEGEND_FONT)
+    if len(countries) == 1:
+        ax.legend().set_visible(False)
+    else:
+        plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontproperties=st.LEGEND_FONT)
 
     if SaveFile:
         plt.savefig(st.PNGFilePath())
