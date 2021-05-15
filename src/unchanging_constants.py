@@ -12,6 +12,7 @@ WEEK = 'week'
 MONTH = 'month'
 EXPECTED_DEATHS = 'expected_deaths'
 EXCESS_DEATHS = 'excess_deaths'
+TOTAL_EXCESS_DEATHS_PCT = 'total_excess_deaths_pct'
 DATE = 'date'
 YEAR = 'year'
 EXCESS_WEEKLY_PCT = 'excess_weekly_pct'
@@ -29,6 +30,8 @@ FACECOLOR = 'figure.facecolor'
 WEB_APP = 'web'
 DESKTOP_APP = 'desktop'
 YES = 'yes'
+ASCII = 'ascii'
+INSIDE = 'inside'
 
 
 OPTIONAL_STR = Optional[str]

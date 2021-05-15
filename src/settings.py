@@ -32,7 +32,13 @@ MAX_COUNTRIES = 5
 
 
 def Select_Country_Message(i: int) -> str:
-	return f'Please enter the name of country {i + 1} you wish to compare: '
+    if i == 1:
+        return 'Please enter the name of the country you wish to view: '
+    return f'Please enter the name of country {i + 1} you wish to compare: '
+
+
+def Desktop_Error_Message(Traceback: str) -> str:
+    return f"Exception!\n\n{Traceback}\n\n"
 
 
 # LOGGING SETTINGS
@@ -40,7 +46,7 @@ LOGGING_CONFIG = '%(asctime)-15s %(name)s %(levelname)s %(message)s'
 
 
 def LogFileName() -> str:
-	return path.join('error_logs', f"Covid graph error log - {datetime.now().strftime('%Y-%m-%d')}.txt")
+    return path.join('error_logs', f"Covid graph error log - {datetime.now().strftime('%Y-%m-%d')}.txt")
 
 
 # GENERAL GRAPH SETTINGS
@@ -52,10 +58,19 @@ STANDARD_FONT = FontProperties(fname=PATH_TO_STANDARD_FONT)
 # GRAPH EXPORT SETTINGS
 EXPORT_FILE_PATH = path.join('graph_images')
 EXPORT_FILE_TYPE = 'png'
+WEB_DISPLAY_FILE_TYPE = 'png'
+
+
+def PNGFilePath() -> str:
+    return path.join(
+        EXPORT_FILE_PATH,
+        f'Covid graph {str(datetime.now()).replace(":", ".")}.{EXPORT_FILE_TYPE}'
+    )
+
 
 # AXES SETTINGS
 AXIS_TICK_COLOUR = STANDARD_TEXT_COLOUR
-AXIS_FONT = STANDARD_FONT
+AXIS_FONT = 'serif'
 AXIS_TEXT_COLOUR = STANDARD_TEXT_COLOUR
 
 # GRAPH DIMENSIONS SETTINGS
@@ -70,13 +85,13 @@ COUNTRIES_WHICH_NEED_ARTICLE = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Ph
 
 
 def AddArticle(country: str) -> str:
-	return f'the {country}' if country in COUNTRIES_WHICH_NEED_ARTICLE else country
+    return f'the {country}' if country in COUNTRIES_WHICH_NEED_ARTICLE else country
 
 
 def GraphTitle(Countries: STRING_LIST) -> str:
-	Countries = list(map(AddArticle, Countries))
-	Countries = Countries[0] if len(Countries) == 1 else f'{", ".join(Countries[:-1])} and {Countries[-1]}'
-	return f'Pandemic excess deaths in {Countries}'
+    Countries = list(map(AddArticle, Countries))
+    Countries = Countries[0] if len(Countries) == 1 else f'{", ".join(Countries[:-1])} and {Countries[-1]}'
+    return f'Pandemic excess deaths in {Countries}'
 
 
 GRAPH_TITLE_POSITION = 0.93

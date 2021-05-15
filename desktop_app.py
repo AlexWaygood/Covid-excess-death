@@ -6,25 +6,12 @@ from traceback_with_variables import iter_exc_lines
 from src.unchanging_constants import STRING_LIST
 import src.settings as st
 from src.graph_plotting import GraphPlotter, PlotAsGraph
-from src.user_input import AskIfTheyWantTheListOfCountries, ValidateRepeatQuestionAnswer, RepeatQuestionText
+from src.desktop_app_user_input import AskIfTheyWantTheListOfCountries, AskRepeatQuestion
 from typing import NoReturn
 
 
 logging.basicConfig(format=st.LOGGING_CONFIG, filename=st.LogFileName())
 logger = logging.getLogger(__name__)
-
-
-def AskRepeatQuestion(
-        GUIUsage: bool,
-        SaveFile: bool,
-        ErrorOccured: bool
-) -> str:
-
-    return inputCustom(
-        ValidateRepeatQuestionAnswer,
-        prompt=RepeatQuestionText(GUIUsage=GUIUsage, PNGExport=SaveFile, ErrorOccured=ErrorOccured),
-        blank=True
-    )
 
 
 class DesktopGraphPlotter(GraphPlotter):
@@ -67,15 +54,14 @@ class DesktopGraphPlotter(GraphPlotter):
             )
 
         except:
-            Traceback = '\n'.join(iter_exc_lines())
-            logging.error(f"Exception!\n\n{Traceback}\n\n")
+            logging.error(st.Desktop_Error_Message('\n'.join(iter_exc_lines())))
             print(st.UNEXPECTED_ERROR_MESSAGE)
             return True
 
     def GetCountryNames(self) -> STRING_LIST:
         return [
             inputCustom(self.ValidateCountryName, st.Select_Country_Message(i))
-            for i in range(inputInt(st.HOW_MANY_COUNTRIES_MESSAGE))
+            for i in range(inputInt(prompt=st.HOW_MANY_COUNTRIES_MESSAGE, min=st.MIN_COUNTRIES, max=st.MAX_COUNTRIES))
         ]
 
     def ValidateCountryName(self, CountryName: str) -> str:

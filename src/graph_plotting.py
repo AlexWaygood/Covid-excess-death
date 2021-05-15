@@ -4,8 +4,6 @@ from src.data_wrangling import WrangleData
 from pandas import DataFrame, read_csv
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
-from os import path
-from datetime import datetime
 from itertools import chain
 
 
@@ -23,13 +21,6 @@ class GraphPlotter:
     def __init__(self) -> None:
         self.FT_data = FetchFTData()
         self.FT_Countries = sorted(list(set(self.FT_data.country.to_list())))
-
-
-def PNGFilePath() -> str:
-    return path.join(
-        st.EXPORT_FILE_PATH,
-        f'Covid graph {str(datetime.now()).replace(":", ".")}.{st.EXPORT_FILE_TYPE}'
-    )
 
 
 def PlotAsGraph(
@@ -97,8 +88,8 @@ def PlotAsGraph(
 
     ax.tick_params(axis=uc.X_AXIS, which=uc.BOTH, colors=st.AXIS_TICK_COLOUR)
 
-    plt.yticks(fontfamily='serif')
-    plt.xticks(fontfamily='serif')
+    plt.yticks(fontfamily=st.AXIS_FONT)
+    plt.xticks(fontfamily=st.AXIS_FONT)
 
     for s in (uc.TOP, uc.RIGHT, uc.LEFT, uc.BOTTOM):
         ax.spines[s].set_visible(False)
@@ -106,7 +97,7 @@ def PlotAsGraph(
     plt.setp(plt.legend().get_texts(), color=st.LEGEND_TEXT_COLOUR, fontproperties=st.LEGEND_FONT)
 
     if SaveFile:
-        plt.savefig(PNGFilePath())
+        plt.savefig(st.PNGFilePath())
 
     if GUIUsage:
         plt.show()
@@ -115,6 +106,6 @@ def PlotAsGraph(
         from io import BytesIO
         from base64 import b64encode
         buf = BytesIO()
-        plt.savefig(buf, format='png')
+        plt.savefig(buf, format=st.WEB_DISPLAY_FILE_TYPE)
         buf.seek(0)
-        return b64encode(buf.getvalue()).decode('ascii')
+        return b64encode(buf.getvalue()).decode(uc.ASCII)

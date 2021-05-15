@@ -1,7 +1,20 @@
-from pyinputplus import inputYesNo
+from pyinputplus import inputYesNo, inputCustom
 from pprint import pprint
 from src.settings import QUIT, LIST_OF_COUNTRIES_QUESTION, INVALID_RESPONSE, ANNOUNCE_LIST_OF_COUNTRIES
 from src.unchanging_constants import YES
+
+
+def AskRepeatQuestion(
+        GUIUsage: bool,
+        SaveFile: bool,
+        ErrorOccured: bool
+) -> str:
+
+    return inputCustom(
+        ValidateRepeatQuestionAnswer,
+        prompt=RepeatQuestionText(GUIUsage=GUIUsage, PNGExport=SaveFile, ErrorOccured=ErrorOccured),
+        blank=True
+    )
 
 
 def AskIfTheyWantTheListOfCountries(FT_Countries: set) -> None:

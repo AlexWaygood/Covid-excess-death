@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, List, TypeVar, Tuple
 import src.settings as st
 from src.graph_plotting import GraphPlotter, PlotAsGraph
-from src.unchanging_constants import STRING_LIST
+from src.unchanging_constants import STRING_LIST, TOTAL_EXCESS_DEATHS_PCT, DATE
 from random import randint, sample as random_sample
 from flask import request
 from time import sleep
@@ -27,7 +27,7 @@ class Country:
 
 		self.LookupName = name
 		self.name = st.AddArticle(name)
-		self.ExcessDeath = round(FT_data.loc[FT_data.region == name]['total_excess_deaths_pct'].max())
+		self.ExcessDeath = round(FT_data.loc[FT_data.region == name][TOTAL_EXCESS_DEATHS_PCT].max())
 
 	def __str__(self) -> str:
 		return self.name
@@ -50,7 +50,7 @@ def ExtractDateFromIndex(
 		index: int
 ) -> str:
 
-	return FT_data.loc[index, 'date'].strftime('%d %B %Y')
+	return FT_data.loc[index, DATE].strftime('%d %B %Y')
 
 
 def GetMessage(
@@ -177,7 +177,10 @@ class WebGraphPlotter(GraphPlotter):
 		if Country0 := request.args.get('Country0'):
 			self.CountryNumber, countries = 1, [Country0]
 
-			while self.CountryNumber < 5 and bool(country := (request.args.get(f'Country{self.CountryNumber}'))):
+			while (
+					self.CountryNumber < st.MAX_COUNTRIES
+					and bool(country := (request.args.get(f'Country{self.CountryNumber}')))
+			):
 				self.CountryNumber += 1
 				# noinspection PyUnboundLocalVariable
 				countries.append(country)
@@ -201,7 +204,7 @@ class WebGraphPlotter(GraphPlotter):
 				while True:
 					# noinspection PyBroadException
 					try:
-						self.GraphAndTitle(random_sample(self.FT_Countries, randint(1, 5)))
+						self.GraphAndTitle(random_sample(self.FT_Countries, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES)))
 						break
 					except:
 						pass
@@ -209,7 +212,7 @@ class WebGraphPlotter(GraphPlotter):
 				try:
 					assert float(CountryNumber).is_integer()
 					CountryNumber = int(CountryNumber)
-					assert 0 < CountryNumber < 6
+					assert st.MIN_COUNTRIES <= CountryNumber <= st.MAX_COUNTRIES
 					self.CountryNumber = CountryNumber
 					self.GraphStage = 1
 				except (ValueError, AssertionError):
@@ -241,4 +244,4 @@ class WebGraphPlotter(GraphPlotter):
 		)
 
 	def TotalExcessDeaths(self, country: str) -> float:
-		return self.FT_data.loc[self.FT_data.region == country]['total_excess_deaths_pct'].max()
+		return self.FT_data.loc[self.FT_data.region == country][TOTAL_EXCESS_DEATHS_PCT].max()
