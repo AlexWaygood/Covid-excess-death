@@ -77,7 +77,7 @@ class DesktopGraphPlotter(GraphPlotter):
             GUIUsage: bool = False
     ) -> None:
 
-        for m in filter(lambda x: x, GetMessage(self.FT_data, CountriesToCompare)):
+        for m in filter(bool, GetMessage(self.FT_data, CountriesToCompare)):
             print(textwrap_fill(m, width=80))
             print('\n')
 
@@ -107,4 +107,5 @@ class DesktopGraphPlotter(GraphPlotter):
         raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
 
 
-DesktopGraphPlotter().Run(GUIUsage=True)
+if __name__ == '__main__':
+    DesktopGraphPlotter().Run(GUIUsage=True)

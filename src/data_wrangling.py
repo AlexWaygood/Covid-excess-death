@@ -5,6 +5,7 @@ from datetime import datetime
 from pandas import date_range, notna, DataFrame
 import src.unchanging_constants as uc
 from src import settings as st
+from contextlib import suppress
 
 """Smattering of helper functions"""
 
@@ -16,7 +17,7 @@ def FilterDataForOneCountry(
 
     return (
         FT_data
-        .loc[FT_data.region == CountryName]
+        .loc[(FT_data.country == CountryName) & (FT_data.region == CountryName)]
         .sort_values(uc.DATE)
         .drop_duplicates()
         .set_index(uc.DATE)
@@ -52,12 +53,11 @@ def WrangleData(
     StartDate = f'2020-{int(min(map(GetMinMonth, data))):02}-01'
     data = [CountrySeries.loc[CountrySeries.index >= StartDate] for CountrySeries in data]
 
-    data = {
-        CountryName: CountrySeries[uc.EXCESS_WEEKLY_PCT]
-        for CountryName, CountrySeries in zip(CountryNames, data)
-    }
+    data = DataFrame(
+        {CountryName: CountrySeries[uc.EXCESS_WEEKLY_PCT] for CountryName, CountrySeries in zip(CountryNames, data)},
+        index=date_range(start=StartDate, end=st.END_DATE)
+    )
 
-    return (
-        DataFrame(data, index=date_range(start=StartDate, end=st.END_DATE))
-        .interpolate(method=st.INTERPOLATE_METHOD, limit_area=uc.INSIDE)
-    ), StartDate
+    for method in st.INTERPOLATE_METHODS:
+        with suppress(ValueError):
+            return data.interpolate(method=method, limit_area=uc.INSIDE), StartDate

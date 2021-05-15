@@ -1,12 +1,11 @@
 import src.unchanging_constants as uc
 import src.settings as st
 from src.data_wrangling import WrangleData
-from pandas import DataFrame, read_csv
+from pandas import DataFrame, read_csv, notna
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 from itertools import chain
 from random import randint, sample as random_sample
-from abc import ABC, abstractmethod
 
 
 rcParams[uc.FRAMEALPHA] = st.LEGEND_OPACITY
@@ -17,19 +16,29 @@ def FetchFTData() -> DataFrame:
     return read_csv(st.FT_DATA_URL, dtype=st.FT_DATA_TYPES, parse_dates=[uc.DATE, ])
 
 
-class GraphPlotter(ABC):
+class GraphPlotter:
     __slots__ =  'FT_data', 'FT_Countries'
 
     def __init__(self) -> None:
         self.FT_data = FetchFTData()
-        self.FT_Countries = sorted(list(set(self.FT_data.country.to_list())))
+
+        self.FT_Countries = sorted(list(filter(
+            self.CheckCountryHasExcessDeathEstimates,
+            set(self.FT_data.country.to_list())
+        )))
+
+    def CheckCountryHasExcessDeathEstimates(self, CountryName: str) -> bool:
+        return not self.FT_data.loc[
+                    (self.FT_data.region == CountryName)
+                    & (self.FT_data.country == CountryName)
+                    & notna(self.FT_data.expected_deaths)
+                ].empty
 
     def RandomCountries(self) -> uc.STRING_LIST:
         return random_sample(self.FT_Countries, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
 
-    @abstractmethod
     def RandomGraph(self, **kwargs) -> None:
-        pass
+        raise NotImplementedError
 
     def RandomGraphLoop(self, **kwargs) -> None:
         while True:
@@ -39,6 +48,28 @@ class GraphPlotter(ABC):
                 break
             except:
                 pass
+
+    def DoTest(
+            self,
+            OnlyDataTest: bool = False,
+            GraphingTest: bool = False
+    ) -> None:
+
+        """Only seems to work as intended in an interactive console when testing matplotlib"""
+
+        print('Starting testing...')
+
+        for country in self.FT_Countries:
+            # noinspection PyBroadException
+            try:
+                if OnlyDataTest:
+                    WrangleData(self.FT_data, [country])
+                elif GraphingTest:
+                    PlotAsGraph(self.FT_data, [country], 'Graph', ReturnImage=True)
+            except:
+                print(country)
+
+        print('Testing finished.')
 
 
 def PlotAsGraph(
@@ -74,7 +105,7 @@ def PlotAsGraph(
     NegLines = range(0, int(min(data.min())), -st.HORIZONTAL_LINE_INCREMENT)
     colour, style, width = st.HORIZONTAL_LINE_COLOUR, st.HORIZONTAL_LINE_STYLE, st.HORIZONTAL_LINE_WIDTH
 
-    for i in filter(lambda x: x, chain(PosLines, NegLines)):
+    for i in filter(bool, chain(PosLines, NegLines)):
         plt.hlines(i, StartDate, st.END_DATE, colors=colour, linestyles=style, linewidths=width)
 
     plt.hlines(
@@ -127,5 +158,15 @@ def PlotAsGraph(
         from base64 import b64encode
         buf = BytesIO()
         plt.savefig(buf, format=st.WEB_DISPLAY_FILE_TYPE)
+        plt.close('all')
         buf.seek(0)
         return b64encode(buf.getvalue()).decode(uc.ASCII)
+
+    plt.close('all')
+
+
+KNOWN_ERRORS = ()
+
+
+if __name__ == '__main__':
+    GraphPlotter().DoTest(GraphingTest=True)

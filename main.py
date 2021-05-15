@@ -1,8 +1,9 @@
-from flask import Flask, render_template
 from typing import Optional, Tuple
+from warnings import filterwarnings
+from flask import Flask, render_template
 from src.web_graph_plotting import WebGraphPlotter
 
-
+filterwarnings('ignore')
 app = Flask(__name__)
 plotter: Optional[WebGraphPlotter] = None
 
@@ -25,11 +26,8 @@ def about() -> str:
 
 @app.route('/dataviewer/')
 def dataviewer(FromRedirect=False) -> str:
-    plotter.Update(FromRedirect)
-
-    if plotter.IncorrectEntry:
+    if plotter.Update(FromRedirect).IncorrectEntry:
         return dataviewer(FromRedirect=True)
-
     return render_template('data_viewer.html', plotter=plotter, FromRedirect=FromRedirect, AboutPage=False)
 
 
@@ -45,5 +43,3 @@ def ServerError(e) -> Tuple[str, int]:
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-#  $('#loading').show();$('#content').hide();document.body.style.cursor = 'wait';

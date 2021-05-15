@@ -1,5 +1,5 @@
 from os import path
-from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, INTERPOLATE, CUBIC, LINEAR, STRING_LIST
+from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, QUADRATIC, CUBIC, SLINEAR, STRING_LIST
 from datetime import datetime
 from matplotlib.font_manager import FontProperties
 
@@ -143,11 +143,7 @@ COPYRIGHT_LABEL_PADDING_FROM_X_AXIS = 25
 # See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html#pandas.DataFrame.interpolate...
 # ...For the full range of interpolation methods that can be supplied
 
-# should be either FFILL or INTERPOLATE
-FILL_MISSING_DATA_METHOD = INTERPOLATE
-
-# only relevant if FILL_MISSING_DATA_METHOD is INTERPOLATE
 # Should be CUBIC or LINEAR
-INTERPOLATE_METHOD = CUBIC
+INTERPOLATE_METHODS = (CUBIC, QUADRATIC, SLINEAR)
 
 
