@@ -19,6 +19,7 @@
                 <nav><ul class="menu">
                     <li><a href="{{ url_for('home') }}">Home</a></li>
                     <li><a href="{{ url_for('about') }}">About</a></li>
+                    <li><a href="{{ url_for('dataviewer') }}">Make a graph</a></li>
                 </ul></nav>
 
             </div></header>
@@ -36,7 +37,7 @@
         {% if plotter.GraphStage == 2 %}
             <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         {% elif AboutPage %}
-            {% for _ in range(6) %}
+            {% for _ in range(9) %}
                  <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
             {% endfor %}
             <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>

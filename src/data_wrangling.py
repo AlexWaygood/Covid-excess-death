@@ -17,7 +17,7 @@ def FilterDataForOneCountry(
 
     return (
         FT_data
-        .loc[(FT_data.country == CountryName) & (FT_data.region == CountryName)]
+        .loc[(FT_data.country == CountryName) & (FT_data.region == CountryName)]  # Need to test both because of Georgia.
         .sort_values(uc.DATE)
         .drop_duplicates()
         .set_index(uc.DATE)
@@ -28,14 +28,12 @@ def FilterDataForOneCountry(
     )
 
 
-def GetMinMonth(df: DataFrame) -> int:
-    return (
-        df
-        .loc[(notna(df.excess_deaths)) & (df.index < datetime.strptime(uc.JAN_01_2021, uc.FT_DATETIME_FORMAT))]
-        .index
-        .month
-        .min(skipna=True)
-        )
+def GetMinDate(df: DataFrame) -> datetime:
+    return df.loc[(notna(df.excess_deaths))].index.min(skipna=True)
+
+
+def GetMaxDate(df: DataFrame) -> datetime:
+    return df.index.max(skipna=True)
 
 
 def WrangleData(
@@ -43,19 +41,15 @@ def WrangleData(
         CountryNames: uc.STRING_LIST
 ) -> Tuple[DataFrame, str]:
 
-    data = (
-        FT_data
-        .loc[(2019 < FT_data.year) & (FT_data.date <= st.END_DATE)]
-        .assign(excess_weekly_pct=lambda x: ((x.excess_deaths / x.expected_deaths) * 100))
-        )
-
-    data = [FilterDataForOneCountry(data, CountryName) for CountryName in CountryNames]
-    StartDate = f'2020-{int(min(map(GetMinMonth, data))):02}-01'
-    data = [CountrySeries.loc[CountrySeries.index >= StartDate] for CountrySeries in data]
+    data = [FilterDataForOneCountry(FT_data, CountryName) for CountryName in CountryNames]
+    StartDate, EndDate = f'2020-{int(min(map(GetMinDate, data)).month):02}-01', max(map(GetMaxDate, data))
 
     data = DataFrame(
-        {CountryName: CountrySeries[uc.EXCESS_WEEKLY_PCT] for CountryName, CountrySeries in zip(CountryNames, data)},
-        index=date_range(start=StartDate, end=st.END_DATE)
+        {
+            CountryName: ((CountrySeries[uc.EXCESS_DEATHS] / CountrySeries[uc.EXPECTED_DEATHS]) * 100)
+            for CountryName, CountrySeries in zip(CountryNames, map(lambda df: df.loc[df.index >= StartDate], data))
+        },
+        index=date_range(start=StartDate, end=f'{EndDate.year}-{(EndDate.month + 1): 02}-01')
     )
 
     for method in st.INTERPOLATE_METHODS:

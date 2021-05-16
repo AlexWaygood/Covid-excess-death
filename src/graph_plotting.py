@@ -165,8 +165,5 @@ def PlotAsGraph(
     plt.close('all')
 
 
-KNOWN_ERRORS = ()
-
-
 if __name__ == '__main__':
     GraphPlotter().DoTest(GraphingTest=True)
