@@ -4,21 +4,22 @@ from pandas import DataFrame
 
 """Magic numbers and strings that don't need to be changed."""
 
-FFILL = 'ffill'
 INTERPOLATE = 'interpolate'
 CUBIC = 'cubic'
 SLINEAR = 'slinear'
 QUADRATIC = 'quadratic'
-WEEK = 'week'
-MONTH = 'month'
+
 EXPECTED_DEATHS = 'expected_deaths'
 EXCESS_DEATHS = 'excess_deaths'
 TOTAL_EXCESS_DEATHS_PCT = 'total_excess_deaths_pct'
 DATE = 'date'
-YEAR = 'year'
+COUNTRY = 'country'
+REGION = 'region'
+DEATHS = 'deaths'
+
 EXCESS_WEEKLY_PCT = 'excess_weekly_pct'
 FT_DATETIME_FORMAT = '%Y-%m-%d'
-JAN_01_2021 = '2021-01-01'
+
 TOP = 'top'
 RIGHT = 'right'
 LEFT = 'left'

@@ -1,38 +1,31 @@
+from __future__ import annotations
+
+import matplotlib.pyplot as plt
 import src.unchanging_constants as uc
 import src.settings as st
-from src.data_wrangling import WrangleData
-from pandas import DataFrame, read_csv, notna
-from matplotlib import rcParams
-import matplotlib.pyplot as plt
+
+from typing import TYPE_CHECKING
 from itertools import chain
 from random import randint, sample as random_sample
+
+from matplotlib import rcParams
+from PyQt5.QtGui import QIcon
+
+from src.data_wrangling import WrangleData, FTDataAndCountries
+
+if TYPE_CHECKING:
+    from pandas import DataFrame
 
 
 rcParams[uc.FRAMEALPHA] = st.LEGEND_OPACITY
 rcParams[uc.FACECOLOR] = st.BACKGROUND_COLOUR
 
 
-def FetchFTData() -> DataFrame:
-    return read_csv(st.FT_DATA_URL, dtype=st.FT_DATA_TYPES, parse_dates=[uc.DATE, ])
-
-
 class GraphPlotter:
     __slots__ =  'FT_data', 'FT_Countries'
 
     def __init__(self) -> None:
-        self.FT_data = FetchFTData()
-
-        self.FT_Countries = sorted(list(filter(
-            self.CheckCountryHasExcessDeathEstimates,
-            set(self.FT_data.country.to_list())
-        )))
-
-    def CheckCountryHasExcessDeathEstimates(self, CountryName: str) -> bool:
-        return not self.FT_data.loc[
-                    (self.FT_data.region == CountryName)
-                    & (self.FT_data.country == CountryName)
-                    & notna(self.FT_data.expected_deaths)
-                ].empty
+        self.FT_data, self.FT_Countries = FTDataAndCountries()
 
     def RandomCountries(self) -> uc.STRING_LIST:
         return random_sample(self.FT_Countries, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
@@ -81,9 +74,14 @@ def PlotAsGraph(
         ReturnImage: bool = False
 ) -> uc.OPTIONAL_STR:
 
-    data, StartDate = WrangleData(FT_data, countries)
+    data, StartDate, EndDate = WrangleData(FT_data, countries)
     fig, ax = plt.subplots(figsize=(st.FIGURE_WIDTH, st.FIGURE_HEIGHT))
     ax = data.plot(ax=ax)
+
+    if GUIUsage:
+        fig.canvas.set_window_title(st.WINDOW_CAPTION)
+        plt.get_current_fig_manager().window.setWindowIcon(QIcon(st.FAVICON_FILE_PATH))
+
     ax.set_facecolor(st.BACKGROUND_COLOUR)
 
     plt.suptitle(
@@ -106,12 +104,12 @@ def PlotAsGraph(
     colour, style, width = st.HORIZONTAL_LINE_COLOUR, st.HORIZONTAL_LINE_STYLE, st.HORIZONTAL_LINE_WIDTH
 
     for i in filter(bool, chain(PosLines, NegLines)):
-        plt.hlines(i, StartDate, st.END_DATE, colors=colour, linestyles=style, linewidths=width)
+        plt.hlines(i, StartDate, EndDate, colors=colour, linestyles=style, linewidths=width)
 
     plt.hlines(
         0,
         StartDate,
-        st.END_DATE,
+        EndDate,
         colors=st.X_AXIS_COLOUR,
         linestyles=st.X_AXIS_LINE_SYTLE,
         linewidths=st.X_AXIS_WIDTH

@@ -1,7 +1,8 @@
 from os import path
-from src.unchanging_constants import WEEK, EXCESS_DEATHS, EXPECTED_DEATHS, DATE, QUADRATIC, CUBIC, SLINEAR, STRING_LIST
+import src.unchanging_constants as uc
 from datetime import datetime
 from matplotlib.font_manager import FontProperties
+from pandas.api.types import CategoricalDtype
 
 """Settings for the whole project"""
 
@@ -13,9 +14,6 @@ WELCOME_MESSAGE = """Welcome to Alex Waygood's interactive data viewer for weekl
 This script uses the FT's data. However, the script itself was written by Alex Waygood, and is in no way affiliated with the FT.
 """
 
-LOADING_FT_DATA = "Loading FT data..."
-FT_DATA_LOADED = "FT data has been loaded!"
-
 LIST_OF_COUNTRIES_QUESTION = "Would you like to see a list of available countries in the FT's dataset? "
 ANNOUNCE_LIST_OF_COUNTRIES = "The following countries are available in the FT's dataset: "
 COUNTRY_NOT_FOUND_MESSAGE = 'Country not in FT dataset; please try again.'
@@ -25,6 +23,9 @@ INVALID_RESPONSE = 'Not a valid response, please try again.'
 
 UNEXPECTED_ERROR_MESSAGE = 'Looks like there was an error here! ' \
                            'Check the log file for more info. Maybe try with different countries?'
+
+METHODOLOGY_MESSAGE = 'For the full details on how these graphs are made,' \
+                   'http://covid-excess-deaths.ew.r.appspot.com/about/'
 
 
 MIN_COUNTRIES = 1
@@ -58,6 +59,8 @@ def LogFileName() -> str:
 
 
 # GENERAL GRAPH SETTINGS
+FAVICON_FILE_PATH = path.join('static', 'images', 'coronavirus.ico')
+WINDOW_CAPTION = "Alex Waygood's interactive data viewer for excess deaths"
 BACKGROUND_COLOUR = '#fdffd4'
 STANDARD_TEXT_COLOUR = '#747564'
 PATH_TO_STANDARD_FONT = path.join('static', 'PlayfairDisplay-VariableFont_wght.ttf')
@@ -85,7 +88,7 @@ AXIS_TEXT_COLOUR = STANDARD_TEXT_COLOUR
 FIGURE_WIDTH = 12
 FIGURE_HEIGHT = 6
 GRAPH_TOP = 0.8
-GRAPH_BOTTOM = 0.2
+GRAPH_BOTTOM = 0.25
 
 # TITLE SETTINGS
 
@@ -96,7 +99,7 @@ def AddArticle(country: str) -> str:
     return f'the {country}' if country in COUNTRIES_WHICH_NEED_ARTICLE else country
 
 
-def GraphTitle(Countries: STRING_LIST) -> str:
+def GraphTitle(Countries: uc.STRING_LIST) -> str:
     Countries = list(map(AddArticle, Countries))
     Countries = Countries[0] if len(Countries) == 1 else f'{", ".join(Countries[:-1])} and {Countries[-1]}'
     return f'Pandemic excess deaths in {Countries}'
@@ -119,9 +122,17 @@ LEGEND_FONT = STANDARD_FONT
 LEGEND_TEXT_COLOUR = STANDARD_TEXT_COLOUR
 
 # DATA SELECTION SETTINGS
-END_DATE = '2021-04-24'
 FT_DATA_URL = 'https://raw.githubusercontent.com/Financial-Times/coronavirus-excess-mortality-data/master/data/ft_excess_deaths.csv'
-FT_DATA_TYPES = {WEEK: float, EXPECTED_DEATHS: float, EXCESS_DEATHS: float, DATE: str}
+
+FT_DATA_TYPES = {
+    uc.EXPECTED_DEATHS: 'float64',
+    uc.EXCESS_DEATHS: 'float64',
+    uc.TOTAL_EXCESS_DEATHS_PCT: 'float64',
+    uc.DATE: object,
+    uc.COUNTRY: 'category',
+    uc.REGION: object,
+    uc.DEATHS: 'float64'
+}
 
 # HORIZONTAL LINE SETTINGS
 HORIZONTAL_LINE_COLOUR = 'silver'
@@ -134,16 +145,17 @@ X_AXIS_COLOUR = 'grey'
 X_AXIS_WIDTH = 1.3
 
 # COPYRIGHT LABEL SETTINGS
-COPYRIGHT_LABEL = 'Data from the Financial Times | Graph © Alex Waygood'
+
+COPYRIGHT_LABEL = 'Data from the Financial Times | Graph © Alex Waygood\n\n' \
+                  'Recent data on excess deaths is likely to be revised upwards in the coming weeks and months.\n'
+
 COPYRIGHT_LABEL_FONT = STANDARD_FONT
 COPYRIGHT_LABEL_COLOUR = STANDARD_TEXT_COLOUR
-COPYRIGHT_LABEL_PADDING_FROM_X_AXIS = 25
+COPYRIGHT_LABEL_PADDING_FROM_X_AXIS = 26
 
 # GRAPH SMOOTHING SETTINGS
 # See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html#pandas.DataFrame.interpolate...
 # ...For the full range of interpolation methods that can be supplied
 
 # Should be CUBIC or LINEAR
-INTERPOLATE_METHODS = (CUBIC, QUADRATIC, SLINEAR)
-
-
+INTERPOLATE_METHODS = (uc.CUBIC, uc.QUADRATIC, uc.SLINEAR)

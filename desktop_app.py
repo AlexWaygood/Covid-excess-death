@@ -4,25 +4,32 @@ import logging
 import src.settings as st
 
 from typing import NoReturn
-from textwrap import fill as textwrap_fill
 from pyinputplus import inputInt, inputCustom
 from traceback_with_variables import iter_exc_lines
 
+from src.desktop_app_maximise_window import MaximiseWindow
 from src.unchanging_constants import STRING_LIST
 from src.graph_plotting import GraphPlotter, PlotAsGraph
-from src.data_analysis_message import GetMessage
+from src.desktop_app_data_analysis_message import PrintDesktopMessage
 from src.desktop_app_user_input import AskIfTheyWantTheListOfCountries, AskRepeatQuestion, RandomGraphSelected
 
 
 logging.basicConfig(format=st.LOGGING_CONFIG, filename=st.LogFileName())
 logger = logging.getLogger(__name__)
 
+TEXT_JUSTIFY = 'center'
+TEXT_STYLE = 'bold white on red'
+VERTICAL_PADDING = 3
+
+MaximiseWindow()
+
 
 class DesktopGraphPlotter(GraphPlotter):
     def __init__(self) -> None:
-        print(st.WELCOME_MESSAGE)
-        print(st.LOADING_FT_DATA)
+        print(f'\n{st.WELCOME_MESSAGE}\n')
+        print('Loading FT data...')
         super().__init__()
+        print('FT data loaded!\n')
 
     def Run(
             self,
@@ -77,17 +84,8 @@ class DesktopGraphPlotter(GraphPlotter):
             GUIUsage: bool = False
     ) -> None:
 
-        for m in filter(bool, GetMessage(self.FT_data, CountriesToCompare)):
-            print(textwrap_fill(m, width=80))
-            print('\n')
-
-        PlotAsGraph(
-            self.FT_data,
-            CountriesToCompare,
-            st.GraphTitle(CountriesToCompare),
-            SaveFile=SaveFile,
-            GUIUsage=GUIUsage
-        )
+        PrintDesktopMessage(self.FT_data, CountriesToCompare, (title := st.GraphTitle(CountriesToCompare)))
+        PlotAsGraph(self.FT_data, CountriesToCompare, title, SaveFile=SaveFile, GUIUsage=GUIUsage)
 
     def GetCountryNames(self) -> STRING_LIST:
         CountryNumber = inputInt(prompt=st.HOW_MANY_COUNTRIES_MESSAGE, min=st.MIN_COUNTRIES, max=st.MAX_COUNTRIES)
