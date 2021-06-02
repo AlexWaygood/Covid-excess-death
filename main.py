@@ -6,7 +6,7 @@ from typing import Optional, Tuple
 from warnings import filterwarnings
 from flask import Flask, render_template
 from src.web_app.web_graph_plotting import WebGraphPlotter
-# from src.link_preview import LinkPreview
+from src.web_app.link_preview import LinkPreview
 
 
 filterwarnings('ignore')
@@ -25,9 +25,9 @@ def home() -> str:
     return render_template('home.html', plotter=plotter.Reset(), AboutPage=False)
 
 
-# @app.route('/link-preview.png')
-# def preview() -> str:
-#     return LinkPreview()
+@app.route('/link-preview.png')
+def preview() -> str:
+    return LinkPreview()
 
 
 @app.route('/about/')
