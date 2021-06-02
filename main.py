@@ -26,7 +26,7 @@ def home() -> str:
 
 @app.route('/link-preview.png')
 def preview() -> str:
-    return send_from_directory('static', 'images/coronavirus.png')
+    return send_from_directory('static', 'images/covid.jpg')
 
 
 @app.route('/about/')
