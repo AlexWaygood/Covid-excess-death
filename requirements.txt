@@ -2,6 +2,7 @@ aiohttp==3.7.2
 altgraph==0.17
 async-timeout==3.0.1
 attrs==20.3.0
+beautifulsoup4
 blinker==1.4
 brotlipy==0.7.0
 cachetools==4.1.1
@@ -21,7 +22,6 @@ ipinfo==4.0.0
 itsdangerous==1.1.0
 jinja2==2.11.2
 kiwisolver==1.2.0
-lxml==4.6.1
 macholib==1.14
 markupsafe==1.1.1
 matplotlib==3.3.1

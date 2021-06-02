@@ -1,20 +1,17 @@
-from io import StringIO, BytesIO
-from lxml.etree import parse, HTMLParser
+from io import BytesIO
+from bs4 import BeautifulSoup
 
 import requests, imgkit
 from flask import request, render_template, Response
 
 
 def LinkPreview() -> str:
-    page_html = requests.get(request.args['url']).text
-
     # Parse the HTML response
-    tree = parse(StringIO(page_html), HTMLParser())
+    soup = BeautifulSoup(requests.get(request.args['url']).text, 'html.parser')
 
     # Get the website's title and description from its metadata
-    head = tree.xpath('/html/head')[0]
-    title = head.xpath('meta[@property="og:title"]/@content')[0]
-    description = head.xpath('meta[@property="og:description"]/@content')[0]
+    title = soup.select('meta[property="og:title"]')[0].attrs['content']
+    description = soup.select('meta[property="og:description"]')[0].attrs['content']
 
     # Render the HTML version of the preview
     preview_html = render_template('preview_card.html', title=title, excerpt=description)
