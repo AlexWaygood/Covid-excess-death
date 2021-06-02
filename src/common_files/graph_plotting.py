@@ -121,7 +121,7 @@ class GraphPlotter:
     def WaitForLoad(self, attr: str) -> None:
         f = attrgetter(attr)
         while not f(self):
-            sleep(0.1)
+            sleep(0.5)
 
     def RandomCountries(self) -> STRING_LIST:
         self.WaitForLoad(COUNTRIES_LOADED)
