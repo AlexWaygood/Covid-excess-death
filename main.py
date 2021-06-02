@@ -4,9 +4,8 @@ use_case.WEB_MODE = True
 
 from typing import Optional, Tuple
 from warnings import filterwarnings
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 from src.web_app.web_graph_plotting import WebGraphPlotter
-from src.web_app.link_preview import LinkPreview
 
 
 filterwarnings('ignore')
@@ -27,7 +26,7 @@ def home() -> str:
 
 @app.route('/link-preview.png')
 def preview() -> str:
-    return LinkPreview()
+    return send_from_directory('static', 'images/coronavirus.png')
 
 
 @app.route('/about/')
