@@ -60,7 +60,7 @@ tornado==6.0.4
 traceback-with-variables==2.0.1
 tweepy==3.10.0
 typing-extensions==3.7.4.3
-urllib3==1.26.2
+urllib3
 werkzeug==1.0.1
 wheel==0.35.1
 win-inet-pton==1.1.0
