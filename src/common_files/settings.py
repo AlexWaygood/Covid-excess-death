@@ -1,8 +1,9 @@
 from os import path
-import src.unchanging_constants as uc
+import src.common_files.unchanging_constants as uc
 from datetime import datetime
 from matplotlib.font_manager import FontProperties
-from pandas.api.types import CategoricalDtype
+from traceback_with_variables import iter_exc_lines
+from typing import Dict
 
 """Settings for the whole project"""
 
@@ -46,8 +47,9 @@ def Select_Country_Message(
     return f'Please {VERB} the {ORDINALS[i]} country you would like to compare'
 
 
-def Desktop_Error_Message(Traceback: str) -> str:
-    return f"Exception!\n\n{Traceback}\n\n"
+def Desktop_Error_Message() -> str:
+    tb = '\n'.join(iter_exc_lines())
+    return f"Exception!\n\n{tb}\n\n"
 
 
 # LOGGING SETTINGS
@@ -70,6 +72,25 @@ STANDARD_FONT = FontProperties(fname=PATH_TO_STANDARD_FONT)
 EXPORT_FILE_PATH = path.join('graph_images')
 EXPORT_FILE_TYPE = 'png'
 WEB_DISPLAY_FILE_TYPE = 'png'
+WEB_PNG_DPI = 100
+
+
+def PNGMetadata(Title: str) -> Dict[str, str]:
+    TodaysDate = datetime.now()
+    StringedDate = TodaysDate.strftime('%Y-%m-%d')
+
+    return {
+        'Title': Title,
+        'Date taken': StringedDate,
+        'Creation Time': StringedDate,
+        'Author': 'Alex Waygood',
+        'Copyright': f'Data from the FT; graph © Alex Waygood {TodaysDate.year}',
+        'Disclaimer': "I'm not an epidemiologist, I'm just a journalist! "
+                      "Please see http://covid-excess-deaths.ew.r.appspot.com/about/ "
+                      "for further information about how to interpret these graphs.",
+        'Software': 'Python3.8, Pandas, Matplotlib',
+        'Comment': 'Thanks for using my app! :)'
+    }
 
 
 def PNGFilePath() -> str:
@@ -91,20 +112,6 @@ GRAPH_TOP = 0.8
 GRAPH_BOTTOM = 0.25
 
 # TITLE SETTINGS
-
-COUNTRIES_WHICH_NEED_ARTICLE = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
-
-
-def AddArticle(country: str) -> str:
-    return f'the {country}' if country in COUNTRIES_WHICH_NEED_ARTICLE else country
-
-
-def GraphTitle(Countries: uc.STRING_LIST) -> str:
-    Countries = list(map(AddArticle, Countries))
-    Countries = Countries[0] if len(Countries) == 1 else f'{", ".join(Countries[:-1])} and {Countries[-1]}'
-    return f'Pandemic excess deaths in {Countries}'
-
-
 GRAPH_TITLE_POSITION = 0.93
 TITLE_SIZE = 'xx-large'
 TITLE_FONT = STANDARD_FONT
@@ -125,13 +132,14 @@ LEGEND_TEXT_COLOUR = STANDARD_TEXT_COLOUR
 FT_DATA_URL = 'https://raw.githubusercontent.com/Financial-Times/coronavirus-excess-mortality-data/master/data/ft_excess_deaths.csv'
 
 FT_DATA_TYPES = {
-    uc.EXPECTED_DEATHS: 'float64',
-    uc.EXCESS_DEATHS: 'float64',
-    uc.TOTAL_EXCESS_DEATHS_PCT: 'float64',
-    uc.DATE: object,
-    uc.COUNTRY: 'category',
+    uc.EXPECTED_DEATHS: uc.FLOAT64,
+    uc.EXCESS_DEATHS: uc.FLOAT64,
+    uc.TOTAL_EXCESS_DEATHS_PCT: uc.FLOAT64,
+    uc.DEATHS: uc.FLOAT64,
     uc.REGION: object,
-    uc.DEATHS: 'float64'
+    uc.DATE: object,
+    uc.COUNTRY: uc.CATEGORY,
+    uc.PERIOD: uc.CATEGORY
 }
 
 # HORIZONTAL LINE SETTINGS
@@ -147,7 +155,7 @@ X_AXIS_WIDTH = 1.3
 # COPYRIGHT LABEL SETTINGS
 
 COPYRIGHT_LABEL = 'Data from the Financial Times | Graph © Alex Waygood\n\n' \
-                  'Recent data on excess deaths is likely to be revised upwards in the coming weeks and months.\n'
+                  'Countries vary in how frequently and promptly they report data, and recent data is likely to be revised upwards.\n'
 
 COPYRIGHT_LABEL_FONT = STANDARD_FONT
 COPYRIGHT_LABEL_COLOUR = STANDARD_TEXT_COLOUR

@@ -1,14 +1,18 @@
-from typing import TypeVar
-import src.settings as st
-from src.graph_plotting import GraphPlotter, PlotAsGraph
-from src.unchanging_constants import STRING_LIST, TOTAL_EXCESS_DEATHS_PCT
-from src.data_analysis_message import GetMessage
+from __future__ import annotations
+from src.common_files import use_case
+
+use_case.WEB_MODE = True
+
+from functools import lru_cache
 from flask import request
-from time import sleep
-from threading import Thread
+from typing import TYPE_CHECKING
 
+import src.common_files.settings as st
+from src.common_files.graph_plotting import GraphPlotter
+from src.common_files.unchanging_constants import COUNTRIES_LOADED, DATA_WRANGLED
 
-T = TypeVar('T')
+if TYPE_CHECKING:
+	from src.common_files.covid_graph_types import STRING_LIST
 
 
 class InputBox:
@@ -26,30 +30,24 @@ class InputBox:
 
 # noinspection PyAttributeOutsideInit
 class WebGraphPlotter(GraphPlotter):
-	__slots__ = 'CountryNumber', 'img', 'ImageTitle', 'InputBoxes', 'GraphStage', 'Message1', 'Message2', 'Message3', \
-	            '_IncorrectEntry', 'Initialised'
+	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'GraphStage', '_IncorrectEntry'
 
-	# noinspection PyMissingConstructor
 	def __init__(self) -> None:
-		self.Reset()
-		self.Initialised = False
-		Thread(target=self.Initialise).start()
+		super().__init__(
+			ReturnImage=True,
+			SaveFile=False,
+			InteractiveUse=False,
+			GUIUsage=False
+		)
 
-	def Reset(self: T) -> T:
+	def Reset(self) -> WebGraphPlotter:
+		super().Reset()
 		self.CountryNumber = 0
 		self.img = ''
-		self.ImageTitle = ''
 		self.InputBoxes = ['']
 		self.GraphStage = 0
-		self.Message1 = ''
-		self.Message2 = ''
-		self.Message3 = ''
 		self._IncorrectEntry = False
 		return self
-
-	def Initialise(self) -> None:
-		super().__init__()
-		self.Initialised = True
 
 	@property
 	def IncorrectEntry(self) -> bool:
@@ -61,18 +59,10 @@ class WebGraphPlotter(GraphPlotter):
 	def IncorrectEntry(self, value: bool) -> None:
 		self._IncorrectEntry = value
 
-	def WaitForData(self) -> None:
-		while not self.Initialised:
-			sleep(0.1)
-
 	def RandomGraph(self) -> None:
 		self.GraphAndTitle(self.RandomCountries())
 
-	def Update(
-			self: T,
-			FromRedirect: bool
-	) -> T:
-
+	def Update(self, FromRedirect: bool) -> WebGraphPlotter:
 		if FromRedirect:
 			return self
 
@@ -90,21 +80,22 @@ class WebGraphPlotter(GraphPlotter):
 				# noinspection PyUnboundLocalVariable
 				countries.append(country)
 
-			self.WaitForData()
+			self.WaitForLoad(DATA_WRANGLED)
 
 			if not all((c in self.FT_Countries) for c in countries):
 				self.GraphStage = 0
 				self.CountryNumber = 0
 				self.IncorrectEntry = True
-				return None
+				return self
 
 			self.GraphAndTitle(countries)
+			return self
 
 		elif CountryNumber := request.args.get('HowManyCountries'):
 			self.IncorrectEntry = False
 
 			if CountryNumber == 'random':
-				self.WaitForData()
+				self.WaitForLoad(DATA_WRANGLED)
 				self.RandomGraphLoop()
 			else:
 				try:
@@ -124,7 +115,7 @@ class WebGraphPlotter(GraphPlotter):
 
 		if self.CountryNumber:
 			self.InputBoxes = [InputBox(i, self.CountryNumber) for i in range(self.CountryNumber)]
-			self.WaitForData()
+			self.WaitForLoad(COUNTRIES_LOADED)
 		else:
 			self.InputBoxes = ['']
 
@@ -133,9 +124,9 @@ class WebGraphPlotter(GraphPlotter):
 	def GraphAndTitle(self, countries: STRING_LIST) -> None:
 		self.IncorrectEntry = False
 		self.GraphStage = 2
-		self.ImageTitle = st.GraphTitle(countries)
-		self.img = PlotAsGraph(self.FT_data, countries, Title=self.ImageTitle, ReturnImage=True)
-		self.Message1, self.Message2, self.Message3 = GetMessage(self.FT_data, countries)
+		self.PrePlot(*countries)
+		self.img = self.Plot(*countries)
 
-	def TotalExcessDeaths(self, country: str) -> float:
-		return self.FT_data.loc[self.FT_data.region == country][TOTAL_EXCESS_DEATHS_PCT].max()
+	@lru_cache
+	def Plot(self, *CountriesToPlot, **kwargs) -> str:
+		return super().Plot(*CountriesToPlot)

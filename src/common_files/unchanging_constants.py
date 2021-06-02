@@ -1,6 +1,4 @@
 from __future__ import annotations
-from typing import List, Optional, Tuple
-from pandas import DataFrame
 
 """Magic numbers and strings that don't need to be changed."""
 
@@ -16,9 +14,18 @@ DATE = 'date'
 COUNTRY = 'country'
 REGION = 'region'
 DEATHS = 'deaths'
+PERIOD = 'period'
 
+FLOAT64 = 'float64'
+CATEGORY = 'category'
+
+COUNTRIES_LOADED = 'CountriesLoaded'
+DATA_WRANGLED = 'DataWrangled'
+
+PERIODIC_EXCESS_DEATHS = 'periodic_excess_deaths'
 EXCESS_WEEKLY_PCT = 'excess_weekly_pct'
 FT_DATETIME_FORMAT = '%Y-%m-%d'
+WORLD_BANK_POPULATION = 'SP.POP.TOTL'
 
 TOP = 'top'
 RIGHT = 'right'
@@ -34,9 +41,3 @@ DESKTOP_APP = 'desktop'
 YES = 'yes'
 ASCII = 'ascii'
 INSIDE = 'inside'
-
-
-OPTIONAL_STR = Optional[str]
-STRING_LIST = List[str]
-DATA_FRAME_LIST = List[DataFrame]
-IMAGE_AND_TITLE = Tuple[str, str]
