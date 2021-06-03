@@ -3,30 +3,36 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta property="og:title" content="Pandemic Excess Deaths">
-        <meta property="og:description" content="Alex Waygood's interactive data viewer">
-        <meta name="description" content="Alex Waygood's interactive data viewer">
-        <meta property="og:type" content="website">
-        <meta property="og:site_name" content="Pandemic Excess Deaths: Interactive Data Viewer">
-        <meta property="og:locale" content="en_GB">
-        <meta property="article:author" content="https://www.facebook.com/alexwaygoodblog/">
-        <meta property="og:url" content="http://covid-excess-deaths.ew.r.appspot.com/">
-        <meta property="og:image" content="http://covid-excess-deaths.ew.r.appspot.com/link-preview.png">
-        <meta name="twitter:image:src" content="http://covid-excess-deaths.ew.r.appspot.com/link-preview.png">
 
-        <meta name="twitter:title" content="Pandemic Excess Deaths">
-        <meta name="twitter:description" content="Alex Waygood's interactive data viewer">
-        <meta name="twitter:creator" content="@CovidGraph">
-        <meta name="twitter:image:alt" content="Pandemic Excess Deaths: Interactive Data Viewer">
-        <meta name="twitter:domain" content="http://covid-excess-deaths.ew.r.appspot.com/">
+        <meta property="og:title"           content="Pandemic Excess Deaths"                                    />
+        <meta property="og:description"     content="Alex Waygood's interactive data viewer"                    />
+        <meta property="og:type"            content="article"                                                   />
+        <meta property="og:site_name"       content="Pandemic Excess Deaths: Interactive Data Viewer"           />
+        <meta property="og:locale"          content="en_GB"                                                     />
+        <meta property="og:url"             content="http://covid-excess-deaths.ew.r.appspot.com/"              />
+        <meta property="og:image"           content="http://covid-excess-deaths.ew.r.appspot.com/link-image/"   />
+        <meta property="og:article:author"  content="Alex Waygood"                                              />
+
+
+        <meta name="twitter:image:src"      content="http://covid-excess-deaths.ew.r.appspot.com/link-image/"   />
+        <meta name="twitter:title"          content="Pandemic Excess Deaths"                                    />
+        <meta name="twitter:description"    content="Alex Waygood's interactive data viewer"                    />
+        <meta name="twitter:creator"        content="@CovidGraph"                                               />
+        <meta name="twitter:site"           content="@CovidGraph"                                               />
+        <meta name="twitter:card"           content="summary_large_image"                                       />
+        <meta name="twitter:image:alt"      content="Pandemic Excess Deaths: Interactive Data Viewer"           />
+        <meta name="twitter:domain"         content="http://covid-excess-deaths.ew.r.appspot.com/"              />
+
+        <meta name="description"            content="Alex Waygood's interactive data viewer"                    />
+        <meta property="article:author"     content="https://www.facebook.com/alexwaygoodblog/"                 />
 
         <title>Pandemic excess deaths: interactive web viewer</title>
 
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-        <link rel="shortcut icon" href="{{ url_for('static', filename='images/coronavirus.ico') }}">
+        <link rel="stylesheet"              href="{{ url_for('static', filename='css/main.css') }}"             />
+        <link rel="shortcut icon"           href="{{ url_for('static', filename='images/coronavirus.ico') }}"   />
 
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}"></script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js">   </script>
+        <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}">                    </script>
     </head>
 
     <body><div class="page-container">
