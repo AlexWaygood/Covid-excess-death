@@ -38,7 +38,7 @@ def static_from_root() -> str:
 def preview() -> str:
     """The image that's shown on links when they're shared on Facebook/Twitter"""
 
-    return send_from_directory(app.static_folder, 'link-graphic.png')
+    return send_from_directory(app.static_folder, 'images/link-graphic.png')
 
 
 ### Specific webpage routes ###
