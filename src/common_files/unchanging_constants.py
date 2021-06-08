@@ -19,7 +19,6 @@ PERIOD = 'period'
 FLOAT64 = 'float64'
 CATEGORY = 'category'
 
-COUNTRIES_LOADED = 'CountriesLoaded'
 DATA_WRANGLED = 'DataWrangled'
 
 PERIODIC_EXCESS_DEATHS = 'periodic_excess_deaths'

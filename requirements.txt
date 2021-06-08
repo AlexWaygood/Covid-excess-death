@@ -2,7 +2,6 @@ aiohttp==3.7.2
 altgraph==0.17
 async-timeout==3.0.1
 attrs==20.3.0
-beautifulsoup4
 blinker==1.4
 brotlipy==0.7.0
 cachetools==4.1.1
@@ -14,6 +13,7 @@ colorama==0.4.4
 commonmark==0.9.1
 cryptography==3.1.1
 cycler==0.10.0
+expiringdict==1.2.1
 future==0.18.2
 flask==1.1.2
 idna==2.10
@@ -35,9 +35,10 @@ pefile==2019.4.18
 pillow==8.0.0
 pycparser==2.20
 pycryptodome==3.9.9
+pygithub==1.55
 pygments==2.7.1
 PyInputPlus==0.2.10
-PyJWT==1.7.1
+PyJWT
 pyOpenSSL==19.1.0
 pyparsing==2.4.7
 PyQt5==5.12.2
@@ -62,6 +63,7 @@ tweepy==3.10.0
 typing-extensions==3.7.4.3
 urllib3
 werkzeug==1.0.1
+wbgapi==1.0.5
 wheel==0.35.1
 win-inet-pton==1.1.0
 wincertstore==0.2

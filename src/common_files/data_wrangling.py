@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+from os import path
+import pickle
 from functools import lru_cache
+from datetime import datetime
 from contextlib import suppress
 from operator import itemgetter
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Optional, Final
 from pandas import read_csv, notna, offsets, date_range, DataFrame
 
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
 
 
-COUNTRIES_WHICH_NEED_ARTICLE = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
+COUNTRIES_WHICH_NEED_ARTICLE: Final = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
 
 
 def FetchFTData() -> DataFrame:
@@ -23,20 +26,45 @@ def FetchFTData() -> DataFrame:
     )
 
 
+class RememberingDict(dict):
+    FILE_PATH: Final = path.join('static', 'FT_data.pickle')
+
+    def __init__(
+            self,
+            data: Optional[dict] = None
+    ) -> None:
+
+        super().__init__(data if data is not None else {})
+        self.LastGithubUpdate: datetime = datetime.now()
+
+    def to_file(self) -> None:
+        with open(self.FILE_PATH, 'wb') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def from_file(cls) -> RememberingDict:
+        with open(cls.FILE_PATH, 'rb') as f:
+            LatestDataset: RememberingDict = pickle.load(f)
+        return LatestDataset
+
+    def LastUpdateTimeReset(self) -> None:
+        self.LastGithubUpdate: datetime = datetime.now()
+
+
 class Country:
     __slots__ = 'LookupName', 'name', 'TotalExcessDeath', 'EndOfWorstPeriod', 'PeriodType', \
                 'PeriodicExcessDeaths', 'RawExcessDeathsInWorstPeriod', 'StartOfWorstPeriod'
 
-    AllCountries = {}
+    AllCountries: RememberingDict[str, Country] = RememberingDict()
 
     @classmethod
-    def MakeCountries(
-            cls,
-            FT_data: DataFrame,
-            *CountriesWithEstimates: str
-    ) -> None:
+    def CountriesFromFile(cls) -> None:
+        cls.AllCountries = RememberingDict.from_file()
 
-        cls.AllCountries = {name: Country(name, FT_data) for name in CountriesWithEstimates}
+    @classmethod
+    def CountriesFromGithub(cls, FT_data: DataFrame) -> None:
+        cls.AllCountries = RememberingDict({name: Country(name, FT_data) for name in FT_data.country.unique()})
+        cls.AllCountries.to_file()
 
     @classmethod
     def select_countries(cls, *SelectedCountries: str) -> Dict[str, Country]:
@@ -46,12 +74,7 @@ class Country:
             if CountryName in SelectedCountries
         }
 
-    def __init__(
-            self,
-            name: str,
-            FT_data: DataFrame
-    ) -> None:
-
+    def __init__(self, name: str, FT_data: DataFrame) -> None:
         self.LookupName = name
         self.name = f'the {name}' if name in COUNTRIES_WHICH_NEED_ARTICLE else name
 

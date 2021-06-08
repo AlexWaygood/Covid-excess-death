@@ -5,11 +5,10 @@ use_case.WEB_MODE = True
 
 from functools import lru_cache
 from flask import request
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, final
 
 import src.common_files.settings as st
 from src.common_files.graph_plotting import GraphPlotter
-from src.common_files.unchanging_constants import COUNTRIES_LOADED, DATA_WRANGLED
 
 if TYPE_CHECKING:
 	from src.common_files.covid_graph_types import STRING_LIST
@@ -29,6 +28,7 @@ class InputBox:
 
 
 # noinspection PyAttributeOutsideInit
+@final
 class WebGraphPlotter(GraphPlotter):
 	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'GraphStage', '_IncorrectEntry'
 
@@ -80,9 +80,9 @@ class WebGraphPlotter(GraphPlotter):
 				# noinspection PyUnboundLocalVariable
 				countries.append(country)
 
-			self.WaitForLoad(DATA_WRANGLED)
+			self.WaitForLoad()
 
-			if not all((c in self.FT_Countries) for c in countries):
+			if not all((c in self.CountryNames()) for c in countries):
 				self.GraphStage = 0
 				self.CountryNumber = 0
 				self.IncorrectEntry = True
@@ -95,7 +95,7 @@ class WebGraphPlotter(GraphPlotter):
 			self.IncorrectEntry = False
 
 			if CountryNumber == 'random':
-				self.WaitForLoad(DATA_WRANGLED)
+				self.WaitForLoad()
 				self.RandomGraphLoop()
 			else:
 				try:
@@ -115,7 +115,7 @@ class WebGraphPlotter(GraphPlotter):
 
 		if self.CountryNumber:
 			self.InputBoxes = [InputBox(i, self.CountryNumber) for i in range(self.CountryNumber)]
-			self.WaitForLoad(COUNTRIES_LOADED)
+			self.WaitForLoad()
 		else:
 			self.InputBoxes = ['']
 

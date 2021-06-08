@@ -1,16 +1,27 @@
+from __future__ import annotations
+
 from src.common_files import use_case
 
 use_case.WEB_MODE = True
 
-from typing import Optional, Tuple
+from expiringdict import ExpiringDict
+from typing import Optional, Tuple, Final
 from warnings import filterwarnings
 from flask import Flask, render_template, send_from_directory, request
 from src.web_app.web_graph_plotting import WebGraphPlotter
 
 
 filterwarnings('ignore')
-app = Flask(__name__, static_folder='static')
+app: Final = Flask(__name__, static_folder='static')
 plotter: Optional[WebGraphPlotter] = None
+CACHED_PAGES: Final[ExpiringDict[str, str]] = ExpiringDict(1_000_000, 86_400)
+
+
+def cached_template_renderer(page: str) -> str:
+    plotter.Reset()
+    if page not in CACHED_PAGES:
+        CACHED_PAGES[page] = render_template(page, plotter=plotter, AboutPage=(page == 'about.html'))
+    return CACHED_PAGES[page]
 
 
 ### Configuration routes ###
@@ -46,12 +57,12 @@ def preview() -> str:
 
 @app.route('/')
 def home() -> str:
-    return render_template('home.html', plotter=plotter.Reset(), AboutPage=False)
+    return cached_template_renderer('home.html')
 
 
 @app.route('/about/')
 def about() -> str:
-    return render_template('about.html', plotter=plotter.Reset(), AboutPage=True)
+    return cached_template_renderer('about.html')
 
 
 @app.route('/dataviewer/')
@@ -67,13 +78,13 @@ def dataviewer(FromRedirect=False) -> str:
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
 def page_not_found(e) -> Tuple[str, int]:
-    return render_template('404.html', plotter=plotter.Reset(), AboutPage=False), 404
+    return cached_template_renderer('404.html'), 404
 
 
 # noinspection PyUnusedLocal
 @app.errorhandler(500)
 def ServerError(e) -> Tuple[str, int]:
-    return render_template('500.html', plotter=plotter.Reset(), AboutPage=False), 500
+    return cached_template_renderer('500.html'), 500
 
 
 if __name__ == '__main__':

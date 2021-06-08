@@ -4,9 +4,7 @@
     <head>
         <meta charset="UTF-8">
 
-        <meta property="og:title"           content="Pandemic Excess Deaths"                                    />
         <meta property="og:description"     content="Alex Waygood's interactive data viewer"                    />
-
         <meta property="og:type"            content="article"                                                   />
         <meta property="og:article:author"  content="Alex Waygood"                                              />
 
@@ -23,7 +21,6 @@
         <meta name="twitter:image:height"   content="744"                                                       />
         <meta name="twitter:image:alt"      content="Pandemic Excess Deaths: Interactive Data Viewer"           />
 
-        <meta name="twitter:title"          content="Pandemic Excess Deaths"                                    />
         <meta name="twitter:description"    content="Alex Waygood's interactive data viewer"                    />
         <meta name="twitter:creator"        content="@CovidGraph"                                               />
         <meta name="twitter:site"           content="@CovidGraph"                                               />
@@ -33,13 +30,12 @@
         <meta name="description"            content="Alex Waygood's interactive data viewer"                    />
         <meta property="article:author"     content="https://www.facebook.com/alexwaygoodblog/"                 />
 
-        <title>Pandemic excess deaths: interactive web viewer</title>
-
-        <link rel="stylesheet"              href="{{ url_for('static', filename='css/main.css') }}"             />
+        <link rel="stylesheet"              href="{{ url_for('static', filename='main.css') }}"                 />
         <link rel="shortcut icon"           href="{{ url_for('static', filename='images/coronavirus.ico') }}"   />
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js">   </script>
         <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}">                    </script>
+
     </head>
 
     <body><div class="page-container">
@@ -65,7 +61,7 @@
     </div>
 
     <footer id="footer"><p>
-
+        <br><br>
         {% if plotter.GraphStage == 2 %}
             <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         {% elif AboutPage %}
@@ -75,13 +71,21 @@
             <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
         {% endif %}
 
-        <a href="http://alexwaygood.com">© Alex Waygood 2021</a>
+        <div class="social-share" align="center">
+            <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
+            <img src="{{ url_for('static', filename='images/facebook_logo.svg') }}" onclick="SocialShare('facebook')">
+            &nbsp;
+            <img src="{{ url_for('static', filename='images/twitter_logo.svg') }}"  onclick="SocialShare('twitter')">
+            &nbsp;
+            <img src="{{ url_for('static', filename='images/linkedin_logo.svg') }}" onclick="SocialShare('linkedin')">
+
+        </div>
 
         {% if plotter.GraphStage == 2 or AboutPage %}
             <br><br>
         {% endif %}
 
-    </p></footer>
+    </footer>
 
     </body>
 

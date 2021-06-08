@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 
 <html lang="en">
+    <head>
+        <meta property="og:title"   content="Pandemic excess deaths: interactive dataviewer"    />
+        <meta name="twitter:title"  content="Pandemic excess deaths: interactive dataviewer"    />
+        <title>Pandemic excess deaths: Interactive dataviewer                                   </title>
+    </head>
+
     {% extends "layout.html" %}
     {% block content %}
 
@@ -106,7 +112,7 @@
 
                                         <option value="" disabled selected hidden>--Please select a country--</option>
 
-                                        {% for country in plotter.FT_Countries %}
+                                        {% for country in plotter.CountryNames() %}
                                             <option value="{{country}}">{{country}}</option>
                                         {% endfor %}
 

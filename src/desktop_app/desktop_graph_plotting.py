@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import src.common_files.settings as st
 
-from typing import NoReturn, TYPE_CHECKING
+from typing import KeysView, NoReturn, TYPE_CHECKING, final
 from pprint import pprint
 
 from rich.text import Text
@@ -13,7 +13,7 @@ from rich import print as rprint
 from pyinputplus import inputInt, inputCustom, inputYesNo, inputMenu
 
 from src.common_files.graph_plotting import GraphPlotter
-from src.common_files.unchanging_constants import YES, COUNTRIES_LOADED, DATA_WRANGLED
+from src.common_files.unchanging_constants import YES
 
 if TYPE_CHECKING:
     from src.common_files.covid_graph_types import STRING_LIST
@@ -25,6 +25,7 @@ TEXT_STYLE = 'bold white on red'
 VERTICAL_PADDING = 3
 
 
+@final
 class DesktopGraphPlotter(GraphPlotter):
     __slots__ = 'ErrorOccured'
 
@@ -56,8 +57,8 @@ class DesktopGraphPlotter(GraphPlotter):
                 break
 
     def CustomGraph(self) -> None:
-        self.WaitForLoad(COUNTRIES_LOADED)
-        AskIfTheyWantTheListOfCountries(self.FT_Countries)
+        self.WaitForLoad()
+        AskIfTheyWantTheListOfCountries(self.CountryNames())
         CountriesToCompare = self.GetCountryNames()
         print()
 
@@ -70,17 +71,17 @@ class DesktopGraphPlotter(GraphPlotter):
             print(st.UNEXPECTED_ERROR_MESSAGE)
             self.ErrorOccured = True
 
-    def WaitForLoad(self, attr: str) -> None:
-        if not getattr(self, attr):
+    def WaitForLoad(self) -> None:
+        if not self.DataWrangled:
             print('Loading, please wait...')
-            super().WaitForLoad(attr)
+        super().WaitForLoad()
 
     def RandomGraph(self) -> None:
         self.MakeGraph(self.RandomCountries())
         self.ErrorOccured = False
 
     def MakeGraph(self, CountriesToCompare: STRING_LIST) -> None:
-        self.WaitForLoad(DATA_WRANGLED)
+        self.WaitForLoad()
         self.PrePlot(*CountriesToCompare)
 
         if self.GUIUsage:
@@ -97,11 +98,11 @@ class DesktopGraphPlotter(GraphPlotter):
         ]
 
     def ValidateCountryName(self, CountryName: str) -> str:
-        if CountryName in self.FT_Countries:
+        if CountryName in self.CountryNames():
             return CountryName
-        if (Capitalised := CountryName.title()) in self.FT_Countries:
+        if (Capitalised := CountryName.title()) in self.CountryNames():
             return Capitalised
-        if (AllCaps := CountryName.upper()) in self.FT_Countries:
+        if (AllCaps := CountryName.upper()) in self.CountryNames():
             return AllCaps
         raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
 
@@ -130,7 +131,7 @@ class DesktopGraphPlotter(GraphPlotter):
         return "Your graph has been cast into the ether, as you apparently didn't want to see it or save it"
 
 
-def AskIfTheyWantTheListOfCountries(FT_Countries: set) -> None:
+def AskIfTheyWantTheListOfCountries(FT_Countries: KeysView[str]) -> None:
     if inputYesNo(st.LIST_OF_COUNTRIES_QUESTION) == YES:
         print(st.ANNOUNCE_LIST_OF_COUNTRIES)
         pprint(FT_Countries)

@@ -6,26 +6,24 @@ import matplotlib, logging
 if not GUI_USAGE:
     matplotlib.use('Agg')
 
-print(f'Application launching in {"" if GUI_USAGE else "non-"}GUI mode, '
-      f'with {matplotlib.get_backend()} as the backend\n')
-
 import matplotlib.pyplot as plt
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
 
-from operator import attrgetter
 from threading import Thread
 from itertools import chain
 from random import randint, sample as random_sample
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, KeysView
 from time import sleep
+from datetime import datetime
 
 from pandas import DataFrame
 from PyQt5.QtGui import QIcon
 from io import BytesIO
+from github import Github
 
 from src.common_files.data_wrangling import FetchFTData, Country, PlottableData
-from src.common_files.unchanging_constants import COUNTRIES_LOADED
+from src.common_files.secret_passwords import GITHUB_API_TOKEN
 
 if WEB_MODE:
     from base64 import b64encode
@@ -56,18 +54,32 @@ def IfWindowClosed(event) -> None:
 def UseInteractively(*countries: str) -> None:
     """Use from src.graph_plotting import UseInteractively to use this function in an interactive Python shell"""
 
-    GraphPlotter(GUIUsage=True, InteractiveUse=True).RequestFromFTGithub().PrePlot(*countries).Plot()
+    GraphPlotter(GUIUsage=True, InteractiveUse=True).PrePlot(*countries).Plot()
 
 
 def CloseAllFigures() -> None:
     plt.close('all')
 
 
+def NoNeedToUpdate(LocalDatasetDate: datetime) -> bool:
+    LastFTUpdate = datetime.strptime(
+        (
+            Github(GITHUB_API_TOKEN)
+            .get_repo('Financial-Times/coronavirus-excess-mortality-data')
+            .get_contents('data')
+            [0]
+            .last_modified
+        ),
+        '%a, %d %b %Y %H:%M:%S %Z'
+    )
+
+    return LastFTUpdate < LocalDatasetDate
+
+
 # noinspection PyAttributeOutsideInit
 class GraphPlotter:
-    __slots__ =  'FT_data', 'FT_Countries', 'WrangledData', 'CountriesLoaded', 'DataWrangled', 'Message1', 'Message2',\
-                 'Message3', 'data', 'StartDate', 'EndDate', 'ImageTitle', 'GUIUsage', 'SaveFile', 'ReturnImage', \
-                 'InteractiveUse'
+    __slots__ =  'DataWrangled', 'Message1', 'Message2', 'Message3', 'data', 'StartDate', 'EndDate', 'ImageTitle', \
+                 'GUIUsage', 'SaveFile', 'ReturnImage', 'InteractiveUse'
 
     def __init__(
             self,
@@ -81,10 +93,19 @@ class GraphPlotter:
         self.SaveFile = SaveFile
         self.ReturnImage = ReturnImage
         self.InteractiveUse = InteractiveUse
-        self.CountriesLoaded = False
         self.DataWrangled = False
-        self.Reset()
-        Thread(target=self.RequestFromFTGithub).start()
+        self.Reset()  # Fills in the values for data, StartDate, EndDate, ImageTitle, Message1, Message2 & Message3 attrs
+        Country.CountriesFromFile()
+
+        if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:
+            self.DataWrangled = True
+        else:
+            Thread(target=self.CheckLastGithubUpdate).start()
+            Thread(target=self.RequestFromFTGithub).start()
+
+    @staticmethod
+    def CountryNames() -> KeysView[str]:
+        return Country.AllCountries.keys()
 
     def Reset(self) -> None:
         self.data = None
@@ -95,15 +116,43 @@ class GraphPlotter:
         self.Message2 = ''
         self.Message3 = ''
 
-    def RequestFromFTGithub(self: GraphPlotterTypeVar) -> GraphPlotterTypeVar:
-        self.FT_data = FetchFTData()
+    def CheckLastGithubUpdate(self) -> None:
+        """
+        In the event that we updated the dataset >1 day ago,
+        we check to see if the FT dataset has been updated since then.
 
-        self.FT_Countries = tuple(self.FT_data.country.unique())
-        self.CountriesLoaded = True
+        If it hasn't, we change self.DataWrangled to True,
+        indicating to the other Thread that it does not need to update our local dataset.
 
-        Country.MakeCountries(self.FT_data, *self.FT_Countries)
+        If it has, we leave self.DataWrangled as False,
+        informing the thread running in parallel that it needs to update our local dataset
+        """
+
+        if NoNeedToUpdate(Country.AllCountries.LastGithubUpdate):
+            self.DataFromFile()  # Changes self.DataWrangled to True
+
+    def RequestFromFTGithub(self) -> None:
+        """
+        Download the csv file on github and process it.
+
+        The other thread running in parallel uses a different function call
+        to determine whether the csv file has been updated since last we downloaded it.
+
+        If it has, then this thread will use the data we have just downloaded to update our local dataset.
+
+        If it hasn't, then we dicard the data that we have just downloaded,
+        as it is identical to the data we already had.
+        """
+
+        df = FetchFTData()
+
+        if not self.DataWrangled:
+            Country.CountriesFromGithub(df)
+            self.DataWrangled = True
+
+    def DataFromFile(self) -> None:
         self.DataWrangled = True
-        return self
+        Country.AllCountries.LastUpdateTimeReset()
 
     def PrePlot(self: GraphPlotterTypeVar, *countries: str) -> GraphPlotterTypeVar:
         (
@@ -118,16 +167,16 @@ class GraphPlotter:
 
         return self
 
-    def WaitForLoad(self, attr: str) -> None:
-        f = attrgetter(attr)
-        while not f(self):
+    def WaitForLoad(self) -> None:
+        while not self.DataWrangled:
             sleep(0.5)
 
     def RandomCountries(self) -> STRING_LIST:
-        self.WaitForLoad(COUNTRIES_LOADED)
-        return random_sample(self.FT_Countries, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
+        self.WaitForLoad()
+        return random_sample(self.CountryNames(), randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
 
     def RandomGraph(self, **kwargs) -> None:
+        """Placeholder method to be filled in higher up the inheritance chain"""
         raise NotImplementedError
 
     def RandomGraphLoop(self) -> None:
@@ -143,23 +192,6 @@ class GraphPlotter:
         else:
             # This clause only reached if there are 5 errors in a row when trying to make a graph.
             print('Lots of errors seem to be taking place here! Check the error log for more details.')
-
-    def DoTest(self, GraphingTest: bool = False) -> None:
-        """Only seems to work as intended in an interactive console when testing matplotlib"""
-
-        print('Starting testing...')
-
-        for country in self.FT_Countries:
-            # noinspection PyBroadException
-            try:
-                Country.MakeCountries(self.FT_data, country)
-                self.PrePlot(country)
-                if GraphingTest:
-                    self.Plot()
-            except:
-                print(country)
-
-        print('Testing finished.')
 
     def Plot(self, *CountriesToPlot: str) -> OPTIONAL_STR:
         return PlotAsGraph(
@@ -296,7 +328,3 @@ def SaveToFileOrFileObj(
         dpi=(st.WEB_PNG_DPI if WEB_MODE else 'figure'),
         metadata=st.PNGMetadata(Title)
     )
-
-
-if __name__ == '__main__':
-    GraphPlotter(ReturnImage=True).DoTest(GraphingTest=True)
