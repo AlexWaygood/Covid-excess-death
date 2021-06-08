@@ -2,25 +2,29 @@
 
 <html lang="en">
     <head>
-        <meta property="og:title"   content="Pandemic excess deaths: interactive dataviewer"    />
-        <meta name="twitter:title"  content="Pandemic excess deaths: interactive dataviewer"    />
-        <title>Pandemic excess deaths: Interactive dataviewer                                   </title>
+        <meta property="og:title"   name="og:title"     content="" />
+        <meta name="twitter:title"                      content="" />
+        <meta property="og:url"     name="og:url"       content="" />
     </head>
 
     {% extends "layout.html" %}
     {% block content %}
 
+    <script>SetMetaAttrsForDataviewer({{plotter.GraphStage}}, "{{plotter.ImageTitle}}")</script>
     <div class="{{'CenteredContent' if plotter.GraphStage < 2 else 'BlockContent'}}">
         <br>
 
         <div id="loading" class="loading CentreAlignedToParent">
             <p class="CentreAlignedToParent">
                 <br><br><br>
+
                 <img
                         class="CentreAlignedToParent"
                         src="{{ url_for('static', filename='images/loading.gif') }}"
-                        alt="Loading..." title="Please wait..."
+                        alt="Loading GIF"
+                        title="Please wait..."
                 />
+
                 <br><br>
                 Loading, please wait...
             </p>
@@ -165,6 +169,19 @@
                 <td><a href="/dataviewer/" class="button MakeAnotherGraphButton CentreAlignedToParent">Make another graph</a></td>
                 <td><a href="/about/" class="button MakeAnotherGraphButton CentreAlignedToParent">About these graphs</a></td>
             </tr></table>
+
+            {% if plotter.RandomGraphSelected %}
+                <p class="RandomGraphPermalink">
+                    <br><br><br>
+                    Permanent link to this graph:
+                    <br>
+
+                    <a href="{{plotter.RandomGraphPermanentURL}}">
+                        http://covid-excess-deaths.ew.r.appspot.com{{plotter.RandomGraphPermanentURL}}
+                    </a>
+                    <br><br>
+                </p>
+            {% endif %}
 
         {% endif %}
     </div>

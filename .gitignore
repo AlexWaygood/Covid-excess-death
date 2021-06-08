@@ -4,6 +4,7 @@ graph_images/*
 error_logs/*
 !error_logs/empty_file_for_git.txt
 src/common_files/secret_passwords.py
+google-app-credentials.json
 
 # Editors
 .vscode/

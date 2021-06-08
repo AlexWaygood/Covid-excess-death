@@ -89,12 +89,24 @@ class GraphPlotter:
             InteractiveUse: bool = False
     ) -> None:
 
+        """
+        The call to self.Reset() fills in the values
+        for data, StartDate, EndDate, ImageTitle, Message1, Message2 & Message3 attrs.
+
+        The call to self.Initialise() loads the data.
+        We do this in a separate thread, as we need the object returned from __init__() as soon as possible.
+        The website won't load until the object is returned.
+        """
+
         self.GUIUsage = GUIUsage
         self.SaveFile = SaveFile
         self.ReturnImage = ReturnImage
         self.InteractiveUse = InteractiveUse
         self.DataWrangled = False
-        self.Reset()  # Fills in the values for data, StartDate, EndDate, ImageTitle, Message1, Message2 & Message3 attrs
+        self.Reset()
+        Thread(target=self.Initialise).start()
+
+    def Initialise(self) -> None:
         Country.CountriesFromFile()
 
         if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:

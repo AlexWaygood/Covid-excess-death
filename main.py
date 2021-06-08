@@ -12,7 +12,7 @@ from src.web_app.web_graph_plotting import WebGraphPlotter
 
 
 filterwarnings('ignore')
-app: Final = Flask(__name__, static_folder='static')
+app: Final = Flask(__name__, static_url_path='/static/', static_folder='static')
 plotter: Optional[WebGraphPlotter] = None
 CACHED_PAGES: Final[ExpiringDict[str, str]] = ExpiringDict(1_000_000, 86_400)
 

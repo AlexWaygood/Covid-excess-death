@@ -30,7 +30,8 @@ class InputBox:
 # noinspection PyAttributeOutsideInit
 @final
 class WebGraphPlotter(GraphPlotter):
-	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'GraphStage', '_IncorrectEntry'
+	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'GraphStage', '_IncorrectEntry', 'RandomGraphSelected', \
+	            'RandomGraphPermanentURL'
 
 	def __init__(self) -> None:
 		super().__init__(
@@ -47,6 +48,8 @@ class WebGraphPlotter(GraphPlotter):
 		self.InputBoxes = ['']
 		self.GraphStage = 0
 		self._IncorrectEntry = False
+		self.RandomGraphSelected = False
+		self.RandomGraphPermanentURL = ''  # Only relevant if the user has asked for a random graph
 		return self
 
 	@property
@@ -60,7 +63,15 @@ class WebGraphPlotter(GraphPlotter):
 		self._IncorrectEntry = value
 
 	def RandomGraph(self) -> None:
-		self.GraphAndTitle(self.RandomCountries())
+		self.RandomGraphSelected = True
+		countries = self.RandomCountries()
+
+		self.RandomGraphPermanentURL = (
+				'/dataviewer/?'
+				+ '&'.join(f'Country{i}={country}' for i, country in enumerate(countries))
+		)
+
+		self.GraphAndTitle(countries)
 
 	def Update(self, FromRedirect: bool) -> WebGraphPlotter:
 		if FromRedirect:
@@ -68,6 +79,8 @@ class WebGraphPlotter(GraphPlotter):
 
 		self.ImageTitle = ''
 		self.img = ''
+		self.RandomGraphSelected = False
+		self.RandomGraphPermanentURL = ''
 
 		if Country0 := request.args.get('Country0'):
 			self.CountryNumber, countries = 1, [Country0]

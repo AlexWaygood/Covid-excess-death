@@ -52,6 +52,20 @@
   transform: scale(1.1);
 }
 
+.social-share img:active {
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  transform: scale(1.1);
+  filter: invert(.3)
+}
+
+.social-share img:checked {
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  transform: scale(1.1);
+  filter: invert(1)
+}
+
 footer {
   position: absolute;
   bottom: 0;
@@ -111,6 +125,27 @@ header a {
 
 .CenteredContent p {
   line-height: 1.8em
+}
+
+.RandomGraphPermalink {
+  font-family: Playfair-Display;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  text-align: center;
+  color: #222;
+  line-height: 1.8em
+}
+
+.RandomGraphPermalink a {
+  color: blue;
+}
+
+.RandomGraphPermalink a:visited {
+   color: purple;
+}
+
+.RandomGraphPermalink a:active {
+   color: red;
 }
 
 .FromRedirect h2 {
