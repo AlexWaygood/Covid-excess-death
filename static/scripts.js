@@ -39,6 +39,7 @@ function SetMetaAttrsForDataviewer(GraphStage, GraphTitle){
 
     document.getElementsByTagName("meta").namedItem('og:title')['content'] = title;
     document.getElementsByTagName('meta').namedItem('twitter:title')['content'] = title;
+    document.getElementsByTagName('meta').namedItem('twitter:text:title')['content'] = title;
     document.getElementsByTagName('meta').namedItem('og:url')['content'] = window.location.href;
     document.title = title;
 }
