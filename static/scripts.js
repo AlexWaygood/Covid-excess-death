@@ -28,18 +28,7 @@ function AddSocialShareLinks(){
     document.getElementById("clipboard_copy_icon").addEventListener("click", CopyLinkToClipboard);
 }
 
-function SetMetaAttrsForDataviewer(GraphStage, GraphTitle){
-    if (GraphStage < 2){
-        var title = "Pandemic excess deaths: select countries to compare";
-    } else if (window.location.href.split("/").pop() == '?HowManyCountries=random'){
-        var title = 'Pandemic excess deaths: generate a random graph'
-    } else{
-        var title = GraphTitle;
-    }
-
-    document.getElementsByTagName("meta").namedItem('og:title')['content'] = title;
-    document.getElementsByTagName('meta').namedItem('twitter:title')['content'] = title;
-    document.getElementsByTagName('meta').namedItem('twitter:text:title')['content'] = title;
-    document.getElementsByTagName('meta').namedItem('og:url')['content'] = window.location.href;
-    document.title = title;
+function LoadingCursor(){
+    document.body.style.cursor = 'wait';
+    return true;
 }

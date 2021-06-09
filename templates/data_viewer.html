@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
+    {% extends "layout.html" %}
+
+    {% block additionaltags %}
+
         {% if plotter.GraphStage < 2 %}
+            <title>Pandemic excess deaths: select countries to compare</title>
             <meta property="og:title"       content="Pandemic excess deaths: select countries to compare" />
             <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare" />
 
-        {% elif url_for(request.path) == "dataviewer/?HowManyCountries=random" %}
+        {% elif request.path == "/dataviewer/?HowManyCountries=random" %}
+            <title>Pandemic excess deaths: generate a random graph</title>
             <meta property="og:title"       content="Pandemic excess deaths: generate a random graph" />
             <meta name="twitter:title"      content="Pandemic excess deaths: generate a random graph" />
 
         {% else %}
+            <title>{{plotter.ImageTitle}}</title>
             <meta property="og:title"       content="{{plotter.ImageTitle}}" />
             <meta name="twitter:title"      content="{{plotter.ImageTitle}}" />
+        {% endif %}
 
-        <meta property="og:url"             content="{{ url_for(request.endpoint) }}" />
-    </head>
+    {% endblock %}
 
-    {% extends "layout.html" %}
     {% block content %}
-
     <div class="{{'CenteredContent' if plotter.GraphStage < 2 else 'BlockContent'}}">
         <br>
 
@@ -194,6 +198,22 @@
 
         {% endif %}
     </div>
+
+    {% endblock %}
+
+    {% block footer %}
+
+        {% if plotter.GraphStage == 2 %}
+            <p>
+                <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+            </p>
+        {% endif %}
+
+        {{ super() }}
+
+        {% if plotter.GraphStage == 2 %}
+            <br><br>
+        {% endif %}
 
     {% endblock %}
 </html>

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
+    {% extends "layout.html" %}
+
+    {% block additionaltags %}
+
         <meta   property="og:title"     content="Pandemic Excess Deaths: About this site"           />
         <meta   name="twitter:title"    content="Pandemic Excess Deaths: About this site"           />
-        <meta   name="twitter:text:title"    content="Pandemic Excess Deaths: About this site"           />
-        <meta   property="og:url"       content="http://covid-excess-deaths.ew.r.appspot.com/about" />
+        <meta   name="twitter:text:title"    content="Pandemic Excess Deaths: About this site"      />
         <title> Pandemic excess deaths: About this site                                             </title>
-    </head>
 
-    {% extends "layout.html" %}
-    {% block title %}Pandemic excess deaths: About this site{% endblock %}
+    {% endblock %}
 
     {% block content %}
         <div class="CenteredContent AboutPage">
@@ -198,6 +198,21 @@
             <p>Please do!!</p>
 
         </div>
+
+    {% endblock %}
+
+    {% block footer %}
+        <p>
+        {% for _ in range(9) %}
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        {% endfor %}
+
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </p>
+
+        {{ super() }}
+
+        <br><br>
 
     {% endblock %}
 

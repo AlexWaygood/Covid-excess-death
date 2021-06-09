@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta   property="og:title"   content="Pandemic excess deaths"                          />
-        <meta   property="og:url"     content="http://covid-excess-deaths.ew.r.appspot.com/"    />
-        <meta   name="twitter:title"  content="Pandemic excess deaths"                          />
-        <meta   name="twitter:text:title"  content="Pandemic excess deaths"                          />
-        <title> Pandemic excess deaths: A site by Alex Waygood                                  </title>
-    </head>
-
     {% extends "layout.html" %}
+
+    {% block additionaltags %}
+        <meta   property="og:title"         content="Pandemic excess deaths"    />
+        <meta   name="twitter:title"        content="Pandemic excess deaths"    />
+        <meta   name="twitter:text:title"   content="Pandemic excess deaths"    />
+        <title> Pandemic excess deaths: A site by Alex Waygood                  </title>
+    {% additionaltags %}
+
     {% block content %}
 
     <div class="CenteredContent HomeBlock">
@@ -27,11 +27,7 @@
             Click the button below to start generating your graph (may take a few seconds to load)!
         </p>
 
-        <a
-                href="/dataviewer/"
-                class="button CentreAlignedToParent"
-                onclick="document.body.style.cursor='wait'; return true;"
-        >
+        <a href="/dataviewer/" class="button CentreAlignedToParent" onclick="LoadingCursor()">
             Make a graph!
         </a>
 
