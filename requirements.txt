@@ -16,6 +16,13 @@ cycler==0.10.0
 expiringdict==1.2.1
 future==0.18.2
 flask==1.1.2
+google-api-core
+google-auth
+google-cloud-core
+google-cloud-storage
+google-crc32c
+google-resumable-media
+googleapis-common-protos
 idna==2.10
 imgkit==1.2.2
 ipinfo==4.0.0

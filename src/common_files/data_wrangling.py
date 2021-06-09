@@ -1,19 +1,31 @@
 from __future__ import annotations
 
-from os import path
 import pickle
 from functools import lru_cache
 from datetime import datetime
 from contextlib import suppress
 from operator import itemgetter
-from typing import Tuple, Dict, Optional, Final
+from typing import Tuple, Dict, Optional, Final, TYPE_CHECKING
 from pandas import read_csv, notna, offsets, date_range, DataFrame
+from google.cloud.storage import Client as GoogleClient
+from google.oauth2.service_account import Credentials as GoogleCredentials
+from io import BytesIO
 
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
+from src.common_files.secret_passwords import GOOGLE_CLOUD_BUCKET_ID
 
+if TYPE_CHECKING:
+    from google.cloud.storage.blob import Blob
 
 COUNTRIES_WHICH_NEED_ARTICLE: Final = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
+PATH_TO_CREDENTIALS: Final = 'google-auth-credentials.json'
+FILE_PATH: Final = 'static/FT_data.pickle'
+
+CREDENTIALS = GoogleCredentials.from_service_account_file(PATH_TO_CREDENTIALS)
+SCOPED_CREDENTIALS = CREDENTIALS.with_scopes(['https://www.googleapis.com/auth/cloud-platform'])
+GOOGLE_CLOUD_CLIENT = GoogleClient(credentials=SCOPED_CREDENTIALS)
+GOOGLE_CLOUD_BUCKET = GOOGLE_CLOUD_CLIENT.get_bucket(GOOGLE_CLOUD_BUCKET_ID)
 
 
 def FetchFTData() -> DataFrame:
@@ -27,25 +39,24 @@ def FetchFTData() -> DataFrame:
 
 
 class RememberingDict(dict):
-    FILE_PATH: Final = path.join('static', 'FT_data.pickle')
-
-    def __init__(
-            self,
-            data: Optional[dict] = None
-    ) -> None:
+    def __init__(self, data: Optional[dict] = None) -> None:
 
         super().__init__(data if data is not None else {})
         self.LastGithubUpdate: datetime = datetime.now()
 
-    def to_file(self) -> None:
-        with open(self.FILE_PATH, 'wb') as f:
-            pickle.dump(self, f)
+    @staticmethod
+    def GetGoogleBlob() -> Blob:
+        return GOOGLE_CLOUD_BUCKET.get_blob(FILE_PATH)
+
+    def to_cloud_storage(self) -> None:
+        file = BytesIO()
+        pickle.dump(self, file)
+        file.seek(0)
+        self.GetGoogleBlob().upload_from_file(file)
 
     @classmethod
-    def from_file(cls) -> RememberingDict:
-        with open(cls.FILE_PATH, 'rb') as f:
-            LatestDataset: RememberingDict = pickle.load(f)
-        return LatestDataset
+    def download_from_cloud(cls) -> RememberingDict:
+        return pickle.loads(cls.GetGoogleBlob().download_as_bytes())
 
     def LastUpdateTimeReset(self) -> None:
         self.LastGithubUpdate: datetime = datetime.now()
@@ -59,12 +70,12 @@ class Country:
 
     @classmethod
     def CountriesFromFile(cls) -> None:
-        cls.AllCountries = RememberingDict.from_file()
+        cls.AllCountries = RememberingDict.download_from_cloud()
 
     @classmethod
     def CountriesFromGithub(cls, FT_data: DataFrame) -> None:
         cls.AllCountries = RememberingDict({name: Country(name, FT_data) for name in FT_data.country.unique()})
-        cls.AllCountries.to_file()
+        cls.AllCountries.to_cloud_storage()
 
     @classmethod
     def select_countries(cls, *SelectedCountries: str) -> Dict[str, Country]:

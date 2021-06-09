@@ -2,16 +2,24 @@
 
 <html lang="en">
     <head>
-        <meta name="og:title" property="og:title"        content="" />
-        <meta name="twitter:title"                      content="" />
-        <meta name="twitter:text:title"                      content="" />
-        <meta name="og:url" property="og:url"           content="" />
+        {% if plotter.GraphStage < 2 %}
+            <meta property="og:title"       content="Pandemic excess deaths: select countries to compare" />
+            <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare" />
+
+        {% elif url_for(request.path) == "dataviewer/?HowManyCountries=random" %}
+            <meta property="og:title"       content="Pandemic excess deaths: generate a random graph" />
+            <meta name="twitter:title"      content="Pandemic excess deaths: generate a random graph" />
+
+        {% else %}
+            <meta property="og:title"       content="{{plotter.ImageTitle}}" />
+            <meta name="twitter:title"      content="{{plotter.ImageTitle}}" />
+
+        <meta property="og:url"             content="{{ url_for(request.endpoint) }}" />
     </head>
 
     {% extends "layout.html" %}
     {% block content %}
 
-    <script>SetMetaAttrsForDataviewer({{plotter.GraphStage}}, "{{plotter.ImageTitle}}")</script>
     <div class="{{'CenteredContent' if plotter.GraphStage < 2 else 'BlockContent'}}">
         <br>
 
