@@ -15,5 +15,41 @@
 
 # Python pycache:
 __pycache__/
+*$py.class
 # Ignored by the build system
 /setup.cfg
+
+# Project-specific
+graph_images/*
+error_logs/*
+src/desktop_app/*
+DEVELOPMENT_ONLY.py
+/LICENSE
+README.md
+
+# Distribution/packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+

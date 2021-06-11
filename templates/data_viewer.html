@@ -10,7 +10,7 @@
             <meta property="og:title"       content="Pandemic excess deaths: select countries to compare" />
             <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare" />
 
-        {% elif request.path == "/dataviewer/?HowManyCountries=random" %}
+        {% elif request.environ['QUERY_STRING'] == "HowManyCountries=random" %}
             <title>Pandemic excess deaths: generate a random graph</title>
             <meta property="og:title"       content="Pandemic excess deaths: generate a random graph" />
             <meta name="twitter:title"      content="Pandemic excess deaths: generate a random graph" />
@@ -190,7 +190,7 @@
                     <br>
 
                     <a href="{{plotter.RandomGraphPermanentURL}}">
-                        http://covid-excess-deaths.ew.r.appspot.com{{plotter.RandomGraphPermanentURL}}
+                        http://covid-excess-deaths.alexwaygood.com{{plotter.RandomGraphPermanentURL}}
                     </a>
                     <br><br>
                 </p>

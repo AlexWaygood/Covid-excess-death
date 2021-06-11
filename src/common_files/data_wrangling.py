@@ -7,25 +7,83 @@ from contextlib import suppress
 from operator import itemgetter
 from typing import Tuple, Dict, Optional, Final, TYPE_CHECKING
 from pandas import read_csv, notna, offsets, date_range, DataFrame
-from google.cloud.storage import Client as GoogleClient
-from google.oauth2.service_account import Credentials as GoogleCredentials
-from io import BytesIO
 
+from src.common_files.use_case import LOCAL_HOSTING
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
-from src.common_files.secret_passwords import GOOGLE_CLOUD_BUCKET_ID
 
 if TYPE_CHECKING:
-    from google.cloud.storage.blob import Blob
+    from src.common_files.covid_graph_types import TWO_CALLABLES
 
 COUNTRIES_WHICH_NEED_ARTICLE: Final = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
-PATH_TO_CREDENTIALS: Final = 'google-auth-credentials.json'
-FILE_PATH: Final = 'static/FT_data.pickle'
 
-CREDENTIALS = GoogleCredentials.from_service_account_file(PATH_TO_CREDENTIALS)
-SCOPED_CREDENTIALS = CREDENTIALS.with_scopes(['https://www.googleapis.com/auth/cloud-platform'])
-GOOGLE_CLOUD_CLIENT = GoogleClient(credentials=SCOPED_CREDENTIALS)
-GOOGLE_CLOUD_BUCKET = GOOGLE_CLOUD_CLIENT.get_bucket(GOOGLE_CLOUD_BUCKET_ID)
+
+def GetFuncs() -> TWO_CALLABLES:
+
+    # If we're running it on the Flask development server,
+    # we need the RememberingDict class to be implemented with the following functions
+
+    if LOCAL_HOSTING:
+        from os import path
+        FILE_PATH: Final = path.join('static', 'FT_data.pickle')
+
+        def to_file(self: RememberingDict) -> None:
+            with open(FILE_PATH, 'wb') as f:
+                pickle.dump(self, f)
+
+        # noinspection PyUnusedLocal
+        def from_file(self: RememberingDict) -> RememberingDict:
+            with open(FILE_PATH, 'rb') as f:
+                LatestDataset: RememberingDict = pickle.load(f)
+            return LatestDataset
+
+        return to_file, from_file
+
+    # If it's being run on Google's servers, we want the implementation to have these functions instead.
+
+    else:
+        from google.cloud.storage import Client as GoogleClient
+        from google.oauth2.service_account import Credentials as GoogleCredentials
+        from src.common_files.secret_passwords import GOOGLE_CLOUD_BUCKET_ID
+
+        if TYPE_CHECKING:
+            from google.cloud.storage.blob import Blob
+
+        PATH_TO_CREDENTIALS: Final = 'google-auth-credentials.json'
+        FILE_PATH: Final = 'static/FT_data.pickle'
+
+        CREDENTIALS = GoogleCredentials.from_service_account_file(PATH_TO_CREDENTIALS)
+        SCOPED_CREDENTIALS = CREDENTIALS.with_scopes(['https://www.googleapis.com/auth/cloud-platform'])
+        GOOGLE_CLOUD_CLIENT = GoogleClient(credentials=SCOPED_CREDENTIALS)
+        GOOGLE_CLOUD_BUCKET = GOOGLE_CLOUD_CLIENT.get_bucket(GOOGLE_CLOUD_BUCKET_ID)
+
+        def GetGoogleBlob() -> Blob:
+            return GOOGLE_CLOUD_BUCKET.get_blob(FILE_PATH)
+
+        def to_cloud(self: RememberingDict) -> None:
+            from io import BytesIO
+            file = BytesIO()
+            pickle.dump(self, file)
+            file.seek(0)
+            GetGoogleBlob().upload_from_file(file)
+
+        # noinspection PyUnusedLocal
+        def from_cloud(self: RememberingDict) -> RememberingDict:
+            return pickle.loads(GetGoogleBlob().download_as_bytes())
+
+        return to_cloud, from_cloud
+
+
+class RememberingDict(dict):
+    to_disk, from_disk = GetFuncs()
+
+    def __init__(self, data: Optional[dict] = None) -> None:
+
+        super().__init__(data if data is not None else {})
+        self.LastGithubUpdate: datetime = datetime.now()
+
+    def LastUpdateTimeReset(self) -> None:
+        self.LastGithubUpdate: datetime = datetime.now()
 
 
 def FetchFTData() -> DataFrame:
@@ -38,30 +96,6 @@ def FetchFTData() -> DataFrame:
     )
 
 
-class RememberingDict(dict):
-    def __init__(self, data: Optional[dict] = None) -> None:
-
-        super().__init__(data if data is not None else {})
-        self.LastGithubUpdate: datetime = datetime.now()
-
-    @staticmethod
-    def GetGoogleBlob() -> Blob:
-        return GOOGLE_CLOUD_BUCKET.get_blob(FILE_PATH)
-
-    def to_cloud_storage(self) -> None:
-        file = BytesIO()
-        pickle.dump(self, file)
-        file.seek(0)
-        self.GetGoogleBlob().upload_from_file(file)
-
-    @classmethod
-    def download_from_cloud(cls) -> RememberingDict:
-        return pickle.loads(cls.GetGoogleBlob().download_as_bytes())
-
-    def LastUpdateTimeReset(self) -> None:
-        self.LastGithubUpdate: datetime = datetime.now()
-
-
 class Country:
     __slots__ = 'LookupName', 'name', 'TotalExcessDeath', 'EndOfWorstPeriod', 'PeriodType', \
                 'PeriodicExcessDeaths', 'RawExcessDeathsInWorstPeriod', 'StartOfWorstPeriod'
@@ -70,12 +104,14 @@ class Country:
 
     @classmethod
     def CountriesFromFile(cls) -> None:
-        cls.AllCountries = RememberingDict.download_from_cloud()
+        # noinspection PyArgumentList
+        cls.AllCountries = cls.AllCountries.from_disk()
 
     @classmethod
     def CountriesFromGithub(cls, FT_data: DataFrame) -> None:
         cls.AllCountries = RememberingDict({name: Country(name, FT_data) for name in FT_data.country.unique()})
-        cls.AllCountries.to_cloud_storage()
+        # noinspection PyArgumentList
+        cls.AllCountries.to_disk()
 
     @classmethod
     def select_countries(cls, *SelectedCountries: str) -> Dict[str, Country]:
