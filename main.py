@@ -6,8 +6,7 @@ from src.common_files import use_case
 use_case.WEB_MODE = True
 
 # This file isn't uploaded to Google App Engine, so won't "exist" from Google's PoV.
-if path.exists('DEVELOPMENT_ONLY.py'):
-    use_case.LOCAL_HOSTING = True
+use_case.LOCAL_HOSTING = path.exists('DEVELOPMENT_ONLY.py')
 
 from flask import Flask, render_template, send_from_directory, request
 from expiringdict import ExpiringDict

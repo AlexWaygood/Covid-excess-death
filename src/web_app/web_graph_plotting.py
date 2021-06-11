@@ -141,5 +141,5 @@ class WebGraphPlotter(GraphPlotter):
 		self.img = self.Plot(*countries)
 
 	@lru_cache
-	def Plot(self, *CountriesToPlot, **kwargs) -> str:
+	def Plot(self, *CountriesToPlot: str, **kwargs) -> str:
 		return super().Plot(*CountriesToPlot)

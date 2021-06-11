@@ -5,20 +5,33 @@ from functools import lru_cache
 from datetime import datetime
 from contextlib import suppress
 from operator import itemgetter
-from typing import Tuple, Dict, Optional, Final, TYPE_CHECKING
+from typing import Dict, Optional, Final, NamedTuple, Callable
 from pandas import read_csv, notna, offsets, date_range, DataFrame
 
 from src.common_files.use_case import LOCAL_HOSTING
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
 
-if TYPE_CHECKING:
-    from src.common_files.covid_graph_types import TWO_CALLABLES
-
 COUNTRIES_WHICH_NEED_ARTICLE: Final = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
 
 
-def GetFuncs() -> TWO_CALLABLES:
+class DatabaseCachingFunctions(NamedTuple):
+    """
+    Whether we're deploying the script locally or on the cloud,
+    the RememberingDict class needs to be able to do two things:
+    retrieve itself from a disk, and save itself to a disk.
+    """
+
+    to_disk: Callable[[RememberingDict], None]
+    from_disk: Callable[[RememberingDict], RememberingDict]
+
+
+def GetFuncs() -> DatabaseCachingFunctions:
+    """
+    The database caching functions that we need for the RememberingDict class below are different
+    depending on whether we're running the script locally on the Flask development server
+    or whether it's been deployed to the cloud.
+    """
 
     # If we're running it on the Flask development server,
     # we need the RememberingDict class to be implemented with the following functions
@@ -37,7 +50,7 @@ def GetFuncs() -> TWO_CALLABLES:
                 LatestDataset: RememberingDict = pickle.load(f)
             return LatestDataset
 
-        return to_file, from_file
+        return DatabaseCachingFunctions(to_file, from_file)
 
     # If it's being run on Google's servers, we want the implementation to have these functions instead.
 
@@ -45,6 +58,7 @@ def GetFuncs() -> TWO_CALLABLES:
         from google.cloud.storage import Client as GoogleClient
         from google.oauth2.service_account import Credentials as GoogleCredentials
         from src.common_files.secret_passwords import GOOGLE_CLOUD_BUCKET_ID
+        from typing import TYPE_CHECKING
 
         if TYPE_CHECKING:
             from google.cloud.storage.blob import Blob
@@ -71,10 +85,15 @@ def GetFuncs() -> TWO_CALLABLES:
         def from_cloud(self: RememberingDict) -> RememberingDict:
             return pickle.loads(GetGoogleBlob().download_as_bytes())
 
-        return to_cloud, from_cloud
+        return DatabaseCachingFunctions(to_cloud, from_cloud)
 
 
 class RememberingDict(dict):
+    """
+    A dict that remembers when it was created,
+    and also knows how to save itself to a disk/unpickle itself from a disk.
+    """
+
     to_disk, from_disk = GetFuncs()
 
     def __init__(self, data: Optional[dict] = None) -> None:
@@ -87,6 +106,8 @@ class RememberingDict(dict):
 
 
 def FetchFTData() -> DataFrame:
+    """Retrieves a fresh copy of the data from the FT's Github repo."""
+
     return (
         read_csv(st.FT_DATA_URL, dtype=st.FT_DATA_TYPES, parse_dates=[uc.DATE, ])
         .filter(items=list(st.FT_DATA_TYPES.keys()))
@@ -121,13 +142,13 @@ class Country:
             if CountryName in SelectedCountries
         }
 
-    def __init__(self, name: str, FT_data: DataFrame) -> None:
-        self.LookupName = name
-        self.name = f'the {name}' if name in COUNTRIES_WHICH_NEED_ARTICLE else name
+    def __init__(self, LookupName: str, FT_data: DataFrame) -> None:
+        self.LookupName = LookupName
+        self.name = f'the {LookupName}' if LookupName in COUNTRIES_WHICH_NEED_ARTICLE else LookupName
 
         df = (
             FT_data
-            .loc[FT_data.country == name]
+            .loc[FT_data.country == LookupName]
             .set_index(uc.DATE)
         )
 
@@ -168,8 +189,25 @@ class Country:
                f"more deaths than would be expected for that {self.PeriodType} of the year."
 
 
+class DataAndDataAnalysis(NamedTuple):
+    """All the info that's needed to plot a graph and produce a paragraph describing the data"""
+
+    AnalysisPart1: str
+    AnalysisPart2: str
+    AnalysisPart3: str
+    Title: str
+    StartDate: str
+    EndDate: str
+    PlottableData: DataFrame
+
+
 @lru_cache
-def PlottableData(*countries: str):
+def PlottableData(*countries: str) -> DataAndDataAnalysis:
+    """
+    Plug in some country names, and this function spits out the data in a form that can be plotted,
+    plus some text strings that can be concatenated to make a coherent analysis of the data
+    """
+
     data = Country.select_countries(*countries)
     Message1, Message2, Message3, Title = GetMessage(*data.values())
     data = {country.LookupName: country.PeriodicExcessDeaths for CountryName, country in data.items()}
@@ -184,12 +222,28 @@ def PlottableData(*countries: str):
 
     for method in st.INTERPOLATE_METHODS:
         with suppress(ValueError):
-            return Message1, Message2, Message3, Title, StartDate, EndDate,\
-                   data.interpolate(method=method, limit_area=uc.INSIDE)
+            return DataAndDataAnalysis(
+                Message1,
+                Message2,
+                Message3,
+                Title,
+                StartDate,
+                EndDate,
+                data.interpolate(method=method, limit_area=uc.INSIDE)
+            )
+
+
+class DataAnalysisMessage(NamedTuple):
+    Part1: str
+    Part2: str
+    Part3: str
+    Title: str
 
 
 @lru_cache
-def GetMessage(*Countries: Country) -> Tuple[str, str, str, str]:
+def GetMessage(*Countries: Country) -> DataAnalysisMessage:
+    """Plug in some countries, get out some strings that can be concatenated to make a coherent analysis of the data."""
+
     Country0, Len = Countries[0], len(Countries)
 
     Title_Countries = f'{Country0}' if Len == 1 else f'{", ".join(map(str, Countries[:-1]))} and {Countries[-1]}'
@@ -222,4 +276,4 @@ def GetMessage(*Countries: Country) -> Tuple[str, str, str, str]:
                f'{Country1.TotalExcessDeath}%, {Country2.TotalExcessDeath}%, {Country3.TotalExcessDeath}% ' \
                f'and {Country4.TotalExcessDeath}%, respectively.'
 
-    return Country0.SummaryStringPart1(), Seg2, Country0.SummaryStringPart2(), Title
+    return DataAnalysisMessage(Country0.SummaryStringPart1(), Seg2, Country0.SummaryStringPart2(), Title)

@@ -24,6 +24,7 @@ graph_images/*
 error_logs/*
 src/desktop_app/*
 DEVELOPMENT_ONLY.py
+desktop_app.py
 /LICENSE
 README.md
 
@@ -52,4 +53,6 @@ MANIFEST
 *.manifest
 *.spec
 
-
+# Pycharm
+.idea/
+.run/

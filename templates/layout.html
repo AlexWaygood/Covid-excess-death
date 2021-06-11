@@ -42,27 +42,23 @@
 
     </head>
 
-    <body><div class="page-container">
-        <div class="content-wrap">
+    <body>
 
-            <header><div class='HeaderContainer'>
-                <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
+        <header><div class='HeaderContainer'>
+            <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
 
-                <nav><ul class="menu">
-                    <li><a href="{{ url_for('home') }}">Home</a></li>
-                    <li><a href="{{ url_for('about') }}">About</a></li>
-                    <li><a href="{{ url_for('dataviewer') }}">Make a graph</a></li>
-                </ul></nav>
+            <nav><ul class="menu">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('about') }}">About</a></li>
+                <li><a href="{{ url_for('dataviewer') }}">Make a graph</a></li>
+            </ul></nav>
 
-            </div></header>
+        </div></header>
 
-            <div class="LayoutContainer">
-                {% block content %}
-                {% endblock %}
-            </div>
-
+        <div class="LayoutContainer">
+            {% block content %}
+            {% endblock %}
         </div>
-    </div>
 
     <footer id="footer">{% block footer %}
         <p>
