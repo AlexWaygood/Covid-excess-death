@@ -9,6 +9,7 @@ src/web_app/google-auth-credentials.json
 # Editors
 .vscode/
 .idea/
+.run/
 
 # Vagrant
 .vagrant/
@@ -131,3 +132,4 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+.run/update_caches.run.xml

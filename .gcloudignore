@@ -20,17 +20,20 @@ __pycache__/
 /setup.cfg
 
 # Project-specific
-graph_images/*
+/LICENSE
+all_requirements.txt
+desktop_app.py
+desktop_requirements.txt
 error_logs/*
+graph_images/*
+README.md
 src/common_files/covid_graph_types.py
 src/remembering_dict/remembering_dict_local.py
 src/remembering_dict/update_caches.py
 src/common_files/timer_decorator.py
 src/desktop_app/*
 src/web_app/DEVELOPMENT_ONLY.py
-desktop_app.py
-/LICENSE
-README.md
+static/FT_data.pickle
 
 # Distribution/packaging
 .Python

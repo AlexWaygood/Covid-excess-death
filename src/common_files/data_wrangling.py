@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from time import sleep
 from functools import lru_cache
 from contextlib import suppress
 from operator import itemgetter
@@ -53,6 +54,9 @@ class Country:
 
     @classmethod
     def select_countries(cls, *SelectedCountries: str) -> Dict[str, Country]:
+        while not cls.AllCountries:
+            sleep(0.5)
+
         return {
             CountryName: country
             for CountryName, country in sorted(cls.AllCountries.items(), key=itemgetter(1), reverse=True)
@@ -147,15 +151,18 @@ def PlottableData(*countries: str) -> DataAndDataAnalysis:
 
     for method in st.INTERPOLATE_METHODS:
         with suppress(ValueError):
-            return DataAndDataAnalysis(
-                Message1,
-                Message2,
-                Message3,
-                Title,
-                StartDate,
-                EndDate,
-                data.interpolate(method=method, limit_area=uc.INSIDE)
-            )
+            interpolated_data = data.interpolate(method=method, limit_area=uc.INSIDE)
+            break
+
+    return DataAndDataAnalysis(
+        Message1,
+        Message2,
+        Message3,
+        Title,
+        StartDate,
+        EndDate,
+        interpolated_data
+    )
 
 
 class DataAnalysisMessage(NamedTuple):

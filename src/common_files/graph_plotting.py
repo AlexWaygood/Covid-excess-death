@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from src.common_files.use_case import WEB_MODE, GUI_USAGE, LOCAL_HOSTING
-import matplotlib
+from src.common_files.use_case import GUI_USAGE, WEB_MODE
+import matplotlib, logging
 
-if not GUI_USAGE:
-    matplotlib.use('Agg')
+matplotlib.use('Qt5Agg' if GUI_USAGE else 'Agg')
 
 import matplotlib.pyplot as plt
 import src.common_files.unchanging_constants as uc
@@ -13,51 +12,30 @@ import src.common_files.settings as st
 from threading import Thread
 from itertools import chain
 from random import randint, sample as random_sample
-from typing import TYPE_CHECKING, Optional, Iterable
+from typing import TYPE_CHECKING, Optional
 from time import sleep
 from datetime import datetime
+from functools import cached_property
 
 from pandas import DataFrame
-from PyQt5.QtGui import QIcon
 from io import BytesIO
 from github import Github
-from traceback_with_variables import iter_exc_lines
 
 from src.common_files.data_wrangling import FetchFTData, Country, PlottableData
-from src.web_app.google_credentials import SCOPED_CREDENTIALS
 from src.common_files.secret_passwords import GITHUB_API_TOKEN
-
-if LOCAL_HOSTING:
-    import logging
-    logger = logging.getLogger(__name__)
-
-else:
-    import google.cloud.logging
-
-    client = google.cloud.logging.Client(credentials=SCOPED_CREDENTIALS)
-
-    # Retrieves a Cloud Logging handler based on the environment
-    # you're running in and integrates the handler with the
-    # Python logging module. By default this captures all logs
-    # at INFO level and higher
-    client.get_default_handler()
-    client.setup_logging()
-    import logging
-
-    class Logger:
-        @staticmethod
-        def error(*args, **kwargs) -> None:
-            logging.error(*args, **kwargs)
-
-    logger = Logger()
-
 
 if WEB_MODE:
     from base64 import b64encode
+elif GUI_USAGE:
+    from PyQt5.QtGui import QIcon
+
 
 if TYPE_CHECKING:
     from src.common_files.covid_graph_types import GraphPlotterTypeVar, STRING_LIST, OPTIONAL_STR, STRING_SEQUENCE
     from _io import BytesIO as BytesIOClass
+
+
+logger = logging.getLogger(__name__)
 
 
 matplotlib.rcParams.update({
@@ -68,18 +46,27 @@ matplotlib.rcParams.update({
 MATPLOTLIB_WINDOW_OPEN = False
 
 
-# noinspection PyUnusedLocal
-def IfWindowClosed(event) -> None:
-    """This is only relevant if you're using this module in an interactive Python shell"""
+if not WEB_MODE:
+    # noinspection PyUnusedLocal
+    def IfWindowClosed(event) -> None:
+        """This is only relevant if you're using this module in an interactive Python shell"""
 
-    global MATPLOTLIB_WINDOW_OPEN
-    MATPLOTLIB_WINDOW_OPEN = False
+        global MATPLOTLIB_WINDOW_OPEN
+        MATPLOTLIB_WINDOW_OPEN = False
 
 
-def UseInteractively(*countries: str) -> None:
-    """Use from src.graph_plotting import UseInteractively to use this function in an interactive Python shell"""
+    def UseInteractively() -> GraphPlotter:
+        """
+        Use from src.common_files.graph_plotting import UseInteractively
+        to get a version of the plotter for use in an interactive Python shell.
 
-    GraphPlotter(GUIUsage=True, InteractiveUse=True).PrePlot(*countries).Plot()
+        Once you've got the plotter object, use the InteractivePlot() function to generate graphs in the shell.
+
+        It probably won't work unless use_case.WEB_MODE=False,
+        use_case.INTERACTIVE_USE=True and use_case.GUIUsage=True.
+        """
+
+        return GraphPlotter(GUIUsage=True, InteractiveUse=True)
 
 
 def CloseAllFigures() -> None:
@@ -104,7 +91,7 @@ def NoNeedToUpdate(LocalDatasetDate: datetime) -> bool:
 # noinspection PyAttributeOutsideInit
 class GraphPlotter:
     __slots__ =  'DataWrangled', 'Message1', 'Message2', 'Message3', 'data', 'StartDate', 'EndDate', 'ImageTitle', \
-                 'GUIUsage', 'SaveFile', 'ReturnImage', 'InteractiveUse'
+                 'GUIUsage', 'SaveFile', 'ReturnImage', 'InteractiveUse', '__dict__'
 
     def __init__(
             self,
@@ -133,22 +120,19 @@ class GraphPlotter:
 
     def Initialise(self) -> None:
         # noinspection PyBroadException
-        try:
-            Country.CountriesFromFile()
+        Country.CountriesFromFile()
 
-            if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:
-                self.DataWrangled = True
-            else:
-                Thread(target=self.CheckLastGithubUpdate).start()
-                Thread(target=self.RequestFromFTGithub).start()
-        except:
-            Country.CountriesFromGithub(FetchFTData())
+        if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:
             self.DataWrangled = True
-            logger.error('\n'.join(iter_exc_lines()))
+        else:
+            Thread(target=self.CheckLastGithubUpdate).start()
+            Thread(target=self.RequestFromFTGithub).start()
 
-    @staticmethod
-    def CountryNames() -> Iterable[str]:
-        return Country.AllCountries.keys()
+    @cached_property
+    def CountryNames(self) -> STRING_SEQUENCE:
+        while not Country.AllCountries:
+            sleep(0.5)
+        return tuple(Country.AllCountries.keys())
 
     def Reset(self) -> None:
         self.data = None
@@ -217,7 +201,7 @@ class GraphPlotter:
     def RandomCountries(self) -> STRING_LIST:
         self.WaitForLoad()
         # noinspection PyTypeChecker
-        return random_sample(self.CountryNames(), randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
+        return random_sample(self.CountryNames, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
 
     def RandomGraph(self, **kwargs) -> None:
         """Placeholder method to be filled in higher up the inheritance chain"""
@@ -231,11 +215,15 @@ class GraphPlotter:
                 break
             except NotImplementedError:
                 raise
-            except Exception:
+            except Exception as e:
                 logger.error(st.Desktop_Error_Message())
+                err = e
         else:
             # This clause only reached if there are 5 errors in a row when trying to make a graph.
             print('Lots of errors seem to be taking place here! Check the error log for more details.')
+            if WEB_MODE:
+                # noinspection PyUnboundLocalVariable
+                raise err
 
     def Plot(self, *CountriesToPlot: str) -> OPTIONAL_STR:
         return PlotAsGraph(
@@ -249,6 +237,18 @@ class GraphPlotter:
             ReturnImage=self.ReturnImage,
             InteractiveUse=self.InteractiveUse
         )
+
+    def InteractivePlot(self, *countries: str) -> None:
+        """
+        Function designed to be used in an interactive shell.
+
+        Will only work if self.GUIUsage=True, self.InteractiveUse=True, use_case.WEB_MODE=False,
+        use_case.GUI_USAGE=True and use_case.INTERACTIVE_MODE=True
+        """
+
+        if countries[0] == 'random':
+            return self.PrePlot(*self.RandomCountries()).Plot()
+        self.PrePlot(*countries).Plot()
 
 
 def PlotAsGraph(
@@ -352,7 +352,8 @@ def PlotAsGraph(
         SaveToFileOrFileObj(Title, buf)
         CloseAllFigures()
         buf.seek(0)
-        return f'data:image/png;base64,{b64encode(buf.getvalue()).decode(uc.ASCII)}'
+        img_as_string = b64encode(buf.getvalue()).decode(uc.ASCII)
+        return f'data:image/png;base64,{img_as_string}' if WEB_MODE else img_as_string
 
     if InteractiveUse:
         while MATPLOTLIB_WINDOW_OPEN:

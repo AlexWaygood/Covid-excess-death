@@ -1,5 +1,5 @@
 INTERACTIVE_MODE = False
-WEB_MODE = False
+WEB_MODE = True
 LOCAL_HOSTING = True
 DESKTOP_MODE = False
 GUI_USAGE = False

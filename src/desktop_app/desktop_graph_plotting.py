@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import src.common_files.settings as st
 
-from typing import KeysView, NoReturn, TYPE_CHECKING, final
+from typing import NoReturn, TYPE_CHECKING, final
 from pprint import pprint
 
 from rich.text import Text
@@ -16,7 +16,7 @@ from src.common_files.graph_plotting import GraphPlotter
 from src.common_files.unchanging_constants import YES
 
 if TYPE_CHECKING:
-    from src.common_files.covid_graph_types import STRING_LIST
+    from src.common_files.covid_graph_types import STRING_LIST, STRING_SEQUENCE
 
 logging.basicConfig(format=st.LOGGING_CONFIG, filename=st.LogFileName())
 
@@ -58,7 +58,7 @@ class DesktopGraphPlotter(GraphPlotter):
 
     def CustomGraph(self) -> None:
         self.WaitForLoad()
-        AskIfTheyWantTheListOfCountries(self.CountryNames())
+        AskIfTheyWantTheListOfCountries(self.CountryNames)
         CountriesToCompare = self.GetCountryNames()
         print()
 
@@ -98,11 +98,11 @@ class DesktopGraphPlotter(GraphPlotter):
         ]
 
     def ValidateCountryName(self, CountryName: str) -> str:
-        if CountryName in self.CountryNames():
+        if CountryName in self.CountryNames:
             return CountryName
-        if (Capitalised := CountryName.title()) in self.CountryNames():
+        if (Capitalised := CountryName.title()) in self.CountryNames:
             return Capitalised
-        if (AllCaps := CountryName.upper()) in self.CountryNames():
+        if (AllCaps := CountryName.upper()) in self.CountryNames:
             return AllCaps
         raise Exception(st.COUNTRY_NOT_FOUND_MESSAGE)
 
@@ -131,7 +131,7 @@ class DesktopGraphPlotter(GraphPlotter):
         return "Your graph has been cast into the ether, as you apparently didn't want to see it or save it"
 
 
-def AskIfTheyWantTheListOfCountries(FT_Countries: KeysView[str]) -> None:
+def AskIfTheyWantTheListOfCountries(FT_Countries: STRING_SEQUENCE) -> None:
     if inputYesNo(st.LIST_OF_COUNTRIES_QUESTION) == YES:
         print(st.ANNOUNCE_LIST_OF_COUNTRIES)
         pprint(FT_Countries)

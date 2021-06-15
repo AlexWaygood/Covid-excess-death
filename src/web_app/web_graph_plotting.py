@@ -91,7 +91,7 @@ class WebGraphPlotter(GraphPlotter):
 
 			self.WaitForLoad()
 
-			if not all((c in self.CountryNames()) for c in countries):
+			if not all((c in self.CountryNames) for c in countries):
 				self.TemplateForRendering = DATAVIEWER_0_PAGE
 				self.CountryNumber = 0
 				self.IncorrectEntry = True

@@ -165,5 +165,4 @@ COPYRIGHT_LABEL_PADDING_FROM_X_AXIS = 26
 # See https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.interpolate.html#pandas.DataFrame.interpolate...
 # ...For the full range of interpolation methods that can be supplied
 
-# Should be CUBIC or LINEAR
 INTERPOLATE_METHODS = (uc.CUBIC, uc.QUADRATIC, uc.SLINEAR)
