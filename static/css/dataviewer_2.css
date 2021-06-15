@@ -1,0 +1,38 @@
+/* Styling for the actual graph itself, and the message that's displayed with it. */
+
+.GraphImageContainer {
+  left: 10px;
+  top: 70px;
+  right: 0
+}
+
+.GraphMessage {
+  display: block;
+  text-weight: bold;
+  text-align: center;
+  color: #333333;
+  align: center;
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
+.GraphMessageTitle {
+  font: bold 24px Times New Roman;
+}
+
+.GraphMessageBody {
+  font: bold 14px Times New Roman;
+}
+
+.GraphMessageBody img {
+  border: 2px solid Gainsboro
+}
+
+/* Styling for permalinks for random graphs */
+
+.RandomGraphPermalink {
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  text-align: center;
+  line-height: 1.8em
+}

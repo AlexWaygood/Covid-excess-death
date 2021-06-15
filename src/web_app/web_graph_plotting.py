@@ -1,17 +1,15 @@
 from __future__ import annotations
-from src.common_files import use_case
-
-use_case.WEB_MODE = True
 
 from functools import lru_cache
-from flask import request
 from typing import TYPE_CHECKING, final
 
 import src.common_files.settings as st
+from src.common_files.unchanging_constants import DATAVIEWER_0_PAGE, DATAVIEWER_1_PAGE, DATAVIEWER_2_PAGE
 from src.common_files.graph_plotting import GraphPlotter
 
 if TYPE_CHECKING:
 	from src.common_files.covid_graph_types import STRING_LIST
+	from flask import Request
 
 
 class InputBox:
@@ -30,7 +28,7 @@ class InputBox:
 # noinspection PyAttributeOutsideInit
 @final
 class WebGraphPlotter(GraphPlotter):
-	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'GraphStage', '_IncorrectEntry', 'RandomGraphSelected', \
+	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'TemplateForRendering', '_IncorrectEntry', 'RandomGraphSelected', \
 	            'RandomGraphPermanentURL'
 
 	def __init__(self) -> None:
@@ -46,8 +44,8 @@ class WebGraphPlotter(GraphPlotter):
 		self.CountryNumber = 0
 		self.img = ''
 		self.InputBoxes = ['']
-		self.GraphStage = 0
-		self._IncorrectEntry = False
+		self.TemplateForRendering = DATAVIEWER_0_PAGE
+		self.IncorrectEntry = False
 		self.RandomGraphSelected = False
 		self.RandomGraphPermanentURL = ''  # Only relevant if the user has asked for a random graph
 		return self
@@ -62,32 +60,30 @@ class WebGraphPlotter(GraphPlotter):
 	def IncorrectEntry(self, value: bool) -> None:
 		self._IncorrectEntry = value
 
-	def RandomGraph(self) -> None:
+	def RandomGraph(self, url_root: str) -> None:
 		self.RandomGraphSelected = True
 		countries = self.RandomCountries()
 
-		self.RandomGraphPermanentURL = (
-				'/dataviewer/?'
-				+ '&'.join(f'Country{i}={country}' for i, country in enumerate(countries))
-		)
+		self.RandomGraphPermanentURL = ''.join((
+			url_root,
+			'/dataviewer/?',
+			'&'.join(f'Country{i}={country}' for i, country in enumerate(countries))
+		))
 
 		self.GraphAndTitle(countries)
 
-	def Update(self, FromRedirect: bool) -> WebGraphPlotter:
-		if FromRedirect:
-			return self
-
+	def Update(self, request_context: Request) -> WebGraphPlotter:
 		self.ImageTitle = ''
 		self.img = ''
 		self.RandomGraphSelected = False
 		self.RandomGraphPermanentURL = ''
 
-		if Country0 := request.args.get('Country0'):
+		if Country0 := request_context.args.get('Country0'):
 			self.CountryNumber, countries = 1, [Country0]
 
 			while (
 					self.CountryNumber < st.MAX_COUNTRIES
-					and bool(country := (request.args.get(f'Country{self.CountryNumber}')))
+					and bool(country := (request_context.args.get(f'Country{self.CountryNumber}')))
 			):
 				self.CountryNumber += 1
 				# noinspection PyUnboundLocalVariable
@@ -96,7 +92,7 @@ class WebGraphPlotter(GraphPlotter):
 			self.WaitForLoad()
 
 			if not all((c in self.CountryNames()) for c in countries):
-				self.GraphStage = 0
+				self.TemplateForRendering = DATAVIEWER_0_PAGE
 				self.CountryNumber = 0
 				self.IncorrectEntry = True
 				return self
@@ -104,25 +100,25 @@ class WebGraphPlotter(GraphPlotter):
 			self.GraphAndTitle(countries)
 			return self
 
-		elif CountryNumber := request.args.get('HowManyCountries'):
+		elif CountryNumber := request_context.args.get('HowManyCountries'):
 			self.IncorrectEntry = False
 
 			if CountryNumber == 'random':
 				self.WaitForLoad()
-				self.RandomGraphLoop()
+				self.RandomGraphLoop(url_root=request_context.url_root)
 			else:
 				try:
 					assert float(CountryNumber).is_integer()
 					CountryNumber = int(CountryNumber)
 					assert st.MIN_COUNTRIES <= CountryNumber <= st.MAX_COUNTRIES
 					self.CountryNumber = CountryNumber
-					self.GraphStage = 1
+					self.TemplateForRendering = DATAVIEWER_1_PAGE
 				except (ValueError, AssertionError):
 					self.IncorrectEntry = True
-					self.GraphStage = 0
+					self.TemplateForRendering = DATAVIEWER_0_PAGE
 					self.CountryNumber = 0
 		else:
-			self.GraphStage = 0
+			self.TemplateForRendering = DATAVIEWER_0_PAGE
 			self.CountryNumber = 0
 			self.IncorrectEntry = False
 
@@ -136,7 +132,7 @@ class WebGraphPlotter(GraphPlotter):
 
 	def GraphAndTitle(self, countries: STRING_LIST) -> None:
 		self.IncorrectEntry = False
-		self.GraphStage = 2
+		self.TemplateForRendering = DATAVIEWER_2_PAGE
 		self.PrePlot(*countries)
 		self.img = self.Plot(*countries)
 

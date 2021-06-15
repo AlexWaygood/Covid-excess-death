@@ -1,6 +1,6 @@
 function WhileLoading(){
     $('.content').hide();
-    $('#loading').show();
+    $('.loading').show();
     document.body.style.cursor = 'wait';
 }
 
@@ -26,9 +26,4 @@ function AddSocialShareLinks(){
     document.getElementById("facebook_icon").addEventListener("click", FacebookShare);
     document.getElementById("linkedin_icon").addEventListener("click", LinkedInShare);
     document.getElementById("clipboard_copy_icon").addEventListener("click", CopyLinkToClipboard);
-}
-
-function LoadingCursor(){
-    document.body.style.cursor = 'wait';
-    return true;
 }

@@ -12,11 +12,10 @@
 
     {% block content %}
 
-    <div class="CenteredContent HomeBlock">
+    <div class="CenteredContent">
         <h1 class="Centred">Welcome to Alex Waygood's interactive data viewer for weekly excess deaths!</h1>
 
-        <p>
-            <br>
+        <p class="HomePageContent">
             This website will auto-generate graphs comparing the impact of the COVID-19 pandemic between countries.
             <br><br>
             This website uses
@@ -25,9 +24,9 @@
             and is in no way affiliated with the FT.
             <br><br>
             Click the button below to start generating your graph (may take a few seconds to load)!
-        </p>
+            <br>
 
-        <a href="/dataviewer/" class="button CentreAlignedToParent" onclick="LoadingCursor()">
+        <a href="/dataviewer/" class="button CentreAlignedToParent" onclick="WhileLoading()">
             Make a graph!
         </a>
 

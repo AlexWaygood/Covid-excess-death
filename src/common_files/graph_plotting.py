@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.common_files.use_case import WEB_MODE, GUI_USAGE
-import matplotlib, logging
+from src.common_files.use_case import WEB_MODE, GUI_USAGE, LOCAL_HOSTING
+import matplotlib
 
 if not GUI_USAGE:
     matplotlib.use('Agg')
@@ -13,7 +13,7 @@ import src.common_files.settings as st
 from threading import Thread
 from itertools import chain
 from random import randint, sample as random_sample
-from typing import TYPE_CHECKING, Optional, KeysView
+from typing import TYPE_CHECKING, Optional, Iterable
 from time import sleep
 from datetime import datetime
 
@@ -21,9 +21,36 @@ from pandas import DataFrame
 from PyQt5.QtGui import QIcon
 from io import BytesIO
 from github import Github
+from traceback_with_variables import iter_exc_lines
 
 from src.common_files.data_wrangling import FetchFTData, Country, PlottableData
+from src.web_app.google_credentials import SCOPED_CREDENTIALS
 from src.common_files.secret_passwords import GITHUB_API_TOKEN
+
+if LOCAL_HOSTING:
+    import logging
+    logger = logging.getLogger(__name__)
+
+else:
+    import google.cloud.logging
+
+    client = google.cloud.logging.Client(credentials=SCOPED_CREDENTIALS)
+
+    # Retrieves a Cloud Logging handler based on the environment
+    # you're running in and integrates the handler with the
+    # Python logging module. By default this captures all logs
+    # at INFO level and higher
+    client.get_default_handler()
+    client.setup_logging()
+    import logging
+
+    class Logger:
+        @staticmethod
+        def error(*args, **kwargs) -> None:
+            logging.error(*args, **kwargs)
+
+    logger = Logger()
+
 
 if WEB_MODE:
     from base64 import b64encode
@@ -32,8 +59,6 @@ if TYPE_CHECKING:
     from src.common_files.covid_graph_types import GraphPlotterTypeVar, STRING_LIST, OPTIONAL_STR, STRING_SEQUENCE
     from _io import BytesIO as BytesIOClass
 
-
-logger = logging.getLogger(__name__)
 
 matplotlib.rcParams.update({
     uc.FRAMEALPHA: st.LEGEND_OPACITY,
@@ -107,16 +132,22 @@ class GraphPlotter:
         Thread(target=self.Initialise).start()
 
     def Initialise(self) -> None:
-        Country.CountriesFromFile()
+        # noinspection PyBroadException
+        try:
+            Country.CountriesFromFile()
 
-        if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:
+            if not (datetime.now() - Country.AllCountries.LastGithubUpdate).days:
+                self.DataWrangled = True
+            else:
+                Thread(target=self.CheckLastGithubUpdate).start()
+                Thread(target=self.RequestFromFTGithub).start()
+        except:
+            Country.CountriesFromGithub(FetchFTData())
             self.DataWrangled = True
-        else:
-            Thread(target=self.CheckLastGithubUpdate).start()
-            Thread(target=self.RequestFromFTGithub).start()
+            logger.error('\n'.join(iter_exc_lines()))
 
     @staticmethod
-    def CountryNames() -> KeysView[str]:
+    def CountryNames() -> Iterable[str]:
         return Country.AllCountries.keys()
 
     def Reset(self) -> None:
@@ -152,7 +183,7 @@ class GraphPlotter:
 
         If it has, then this thread will use the data we have just downloaded to update our local dataset.
 
-        If it hasn't, then we dicard the data that we have just downloaded,
+        If it hasn't, then we discard the data that we have just downloaded,
         as it is identical to the data we already had.
         """
 
@@ -185,17 +216,18 @@ class GraphPlotter:
 
     def RandomCountries(self) -> STRING_LIST:
         self.WaitForLoad()
+        # noinspection PyTypeChecker
         return random_sample(self.CountryNames(), randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
 
     def RandomGraph(self, **kwargs) -> None:
         """Placeholder method to be filled in higher up the inheritance chain"""
         raise NotImplementedError
 
-    def RandomGraphLoop(self) -> None:
+    def RandomGraphLoop(self, **kwargs) -> None:
         for i in range(5):
             # noinspection PyBroadException
             try:
-                self.RandomGraph()
+                self.RandomGraph(**kwargs)
                 break
             except NotImplementedError:
                 raise
@@ -320,7 +352,7 @@ def PlotAsGraph(
         SaveToFileOrFileObj(Title, buf)
         CloseAllFigures()
         buf.seek(0)
-        return b64encode(buf.getvalue()).decode(uc.ASCII)
+        return f'data:image/png;base64,{b64encode(buf.getvalue()).decode(uc.ASCII)}'
 
     if InteractiveUse:
         while MATPLOTLIB_WINDOW_OPEN:

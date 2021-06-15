@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% extends "layout.html" %}
+
+    {% block additionaltags %}
+
+        <link rel="stylesheet"  href="{{ url_for('static', filename='css/dataviewer_2.css') }}"         />
+
+        {% if plotter.RandomGraphSelected %}
+            <title> Pandemic excess deaths: generate a random graph                                     </title>
+            <meta   property="og:title"       content="Pandemic excess deaths: generate a random graph" />
+            <meta   name="twitter:title"      content="Pandemic excess deaths: generate a random graph" />
+
+        {% else %}
+            <title> {{plotter.ImageTitle}}                                                              </title>
+            <meta   property="og:title"       content="{{plotter.ImageTitle}}"                          />
+            <meta   name="twitter:title"      content="{{plotter.ImageTitle}}"                          />
+
+        {% endif %}
+
+    {% endblock %}
+
+    {% block content %}<div class="GraphImageContainer">
+
+        <div class="GraphMessage">
+
+            <p class="GraphMessageTitle">{{plotter.Message1}}<br><br></p>
+
+            <p class="GraphMessageBody">
+
+                {% if plotter.Message2 %}
+                    {{plotter.Message2}}<br><br>
+                {% endif %}
+
+                {{plotter.Message3}}<br><br><br>
+                <img src="{{plotter.img}}" title="{{plotter.ImageTitle}}" alt="{{plotter.ImageTitle}}"/>
+                <br>
+            </p>
+
+        </div>
+
+        <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
+
+            <td><a
+                        href="{{plotter.img}}"
+                        class="button MakeAnotherGraphButton CentreAlignedToParent"
+                        download="{{plotter.ImageTitle}}"
+                >
+                    Download graph
+            </a></td>
+
+            <td><a href="{{ url_for('dataviewer') }}" class="button MakeAnotherGraphButton CentreAlignedToParent">
+                Make another graph
+            </a></td>
+
+            <td><a href="{{ url_for('about') }}" class="button MakeAnotherGraphButton CentreAlignedToParent">
+                About these graphs
+            </a></td>
+
+        </tr></table>
+
+        {% if plotter.RandomGraphSelected %}
+
+            <p class="RandomGraphPermalink">
+                <br><br><br>
+                Permanent link to this graph:
+                <br>
+
+                <a href="{{plotter.RandomGraphPermanentURL}}">{{plotter.RandomGraphPermanentURL}}</a>
+                <br><br>
+            </p>
+
+        {% endif %}
+
+    </div>{% endblock %}
+
+    {% block footer %}
+
+        <p>
+            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </p>
+
+        {{ super() }}
+
+        <br><br>
+
+    {% endblock %}
+
+</html>

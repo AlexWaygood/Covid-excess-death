@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    {% extends "layout.html" %}
+
+    {% block additionaltags %}
+
+        <title>Pandemic excess deaths: select countries to compare                                      </title>
+        <meta property="og:title"       content="Pandemic excess deaths: select countries to compare"   />
+        <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare"   />
+        <link rel="stylesheet"  href="{{ url_for('static', filename='css/dataviewer_0.css') }}"         />
+
+    {% endblock %}
+
+    {% block content %}
+
+        <div class="DataviewerCenteredContent">
+
+            {% if FromRedirect %}
+
+                <h2 class="Centred FromRedirectHeader">It looks like you made a mistake when entering a URL!</h2>
+
+                <p class="Centred">
+                    You either entered an invalid number of countries,
+                    or tried to enter a country that isn't in the FT's dataset.<br>
+                    Either enter the URL again, or complete the form manually here.
+                <hr>
+                <br>
+
+            {% endif %}
+
+            <p class="Centred">To make a custom graph, please specify how many countries you want to compare:</p>
+
+                <form action="" method="get" class="HowManyCountriesForm CentreAlignedToParent" onsubmit="WhileLoading()">
+
+                    <table>
+
+                        <tr>
+                            {% for i in range(1, 6) %}
+                                <td>
+                                    <input type="radio" id={{i}} name="HowManyCountries" value={{i}} class="RadioButton">
+                                </td>
+                            {% endfor %}
+                        </tr>
+
+                        <tr>
+                            {% for i in range(1, 6) %}
+                                <td>
+                                    <label for={{i}}>{{i}}</label>
+                                </td>
+                            {% endfor %}
+                        </tr>
+
+                    </table>
+
+                    <p><input type="submit" value="Submit" class="button"></p>
+
+                </form>
+
+                <p class="Centred">
+
+                    <br><br><br><br><br><br>
+                    Alternatively, click the button below to generate a random graph!
+                    <br><br>
+
+                    <a
+                            href="/dataviewer/?HowManyCountries=random"
+                            class="button CentreAlignedToParent"
+                            onclick="WhileLoading()"
+                    >
+                        Generate random graph
+                    </a>
+
+                </p>
+        </div>
+
+    {% endblock %}
+
+    {% block footer %}
+        {% if FromRedirect %}
+            <br><br><br><br><br><br><br><br><br><br><br><br>
+        {% endif %}
+        {{ super() }}
+    {% endblock %}
+
+
+</html>

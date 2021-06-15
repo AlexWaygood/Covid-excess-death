@@ -22,8 +22,12 @@ __pycache__/
 # Project-specific
 graph_images/*
 error_logs/*
+src/common_files/covid_graph_types.py
+src/remembering_dict/remembering_dict_local.py
+src/remembering_dict/update_caches.py
+src/common_files/timer_decorator.py
 src/desktop_app/*
-DEVELOPMENT_ONLY.py
+src/web_app/DEVELOPMENT_ONLY.py
 desktop_app.py
 /LICENSE
 README.md

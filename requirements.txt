@@ -19,6 +19,7 @@ flask==1.1.2
 google-api-core
 google-auth
 google-cloud-core
+google-cloud-logging
 google-cloud-storage
 google-crc32c
 google-resumable-media

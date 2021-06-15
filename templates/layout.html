@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-     <head>
+    <head>
          <meta charset="UTF-8">
 
          <meta property="og:description"     content="Alex Waygood's interactive data viewer"                   />
@@ -12,11 +12,11 @@
          <meta property="og:locale"          content="en_GB"                                                    />
          <meta property="og:url"             content="{{request.url}}"                                          />
 
-         <meta property="og:image"           content="http://covid-excess-deaths.alexwaygood.com/link-image/"   />
+         <meta property="og:image"           content="{{ url_for('social_media_link_preview') }}"               />
          <meta property="og:image:width"     content="1418"                                                     />
          <meta property="og:image:height"    content="744"                                                      />
 
-         <meta name="twitter:image:src"      content="http://covid-excess-deaths.alexwaygood.com/link-image/"   />
+         <meta name="twitter:image:src"      content="{{ url_for('social_media_link_preview') }}"               />
          <meta name="twitter:image:width"    content="1418"                                                     />
          <meta name="twitter:image:height"   content="744"                                                      />
          <meta name="twitter:image:alt"      content="Pandemic Excess Deaths: Interactive Data Viewer"          />
@@ -25,12 +25,14 @@
          <meta name="twitter:creator"        content="@CovidGraph"                                              />
          <meta name="twitter:site"           content="@CovidGraph"                                              />
          <meta name="twitter:card"           content="summary_large_image"                                      />
-         <meta name="twitter:domain"         content="http://covid-excess-deaths.alexwaygood.com/"              />
+         <meta name="twitter:domain"         content="{{ request.url_root }}"                                   />
 
          <meta name="description"            content="Alex Waygood's interactive data viewer"                   />
          <meta property="article:author"     content="https://www.facebook.com/alexwaygoodblog/"                />
 
-         <link rel="stylesheet"              href="{{ url_for('static', filename='main.css') }}"                />
+         <link rel="stylesheet"              href="{{ url_for('static', filename='css/main.css') }}"            />
+         <link rel="stylesheet"              href="{{ url_for('static', filename='css/header.css') }}"          />
+         <link rel="stylesheet"              href="{{ url_for('static', filename='css/footer.css') }}"          />
          <link rel="shortcut icon"           href="{{ url_for('static', filename='images/coronavirus.ico') }}"  />
 
          <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js">           </script>
@@ -45,64 +47,84 @@
     <body>
 
         <header><div class='HeaderContainer'>
-            <h1 class="logo"><a href="/">Pandemic excess deaths: interactive web viewer</a></h1>
+            <h1>
+                <img src="{{ url_for('static', filename='images/coronavirus.ico') }}">
+                <a href="/">Pandemic excess deaths: interactive web viewer</a>
+            </h1>
 
-            <nav><ul class="menu">
+            <nav><ul>
                 <li><a href="{{ url_for('home') }}">Home</a></li>
                 <li><a href="{{ url_for('about') }}">About</a></li>
-                <li><a href="{{ url_for('dataviewer') }}">Make a graph</a></li>
+                <li><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">Make a graph</a></li>
             </ul></nav>
 
         </div></header>
 
-        <div class="LayoutContainer">
-            {% block content %}
-            {% endblock %}
+        <div class="LayoutContentContainer">
+
+            <div class="loading CentreAlignedToParent"><p class="CentreAlignedToParent">
+
+                <img
+                        class="CentreAlignedToParent"
+                        src="{{ url_for('static', filename='images/loading.gif') }}"
+                        alt="Loading GIF"
+                        title="Please wait..."
+                />
+
+                <br><br>
+
+                Loading, please wait...
+
+            </p></div>
+
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+
         </div>
 
-    <footer id="footer">{% block footer %}
+    <footer>{% block footer %}
         <p>
         <br><br>
 
-        <div class="social-share" align="center">
-            <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
+        <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
 
-            <img
-                    src="{{ url_for('static', filename='images/facebook_logo.svg') }}"
-                    id="facebook_icon"
-                    title="Share this page on Facebook"
-                    alt="Share this page on Facebook"
-            >
+        <img
+                src="{{ url_for('static', filename='images/facebook_logo.svg') }}"
+                id="facebook_icon"
+                title="Share this page on Facebook"
+                alt="Share this page on Facebook"
+        >
 
-            &nbsp;
+        &nbsp;
 
-            <img
-                    src="{{ url_for('static', filename='images/twitter_logo.svg') }}"
-                    id="twitter_icon"
-                    title="Share this page on Twitter"
-                    alt="Share this page on Twitter"
-            >
+        <img
+                src="{{ url_for('static', filename='images/twitter_logo.svg') }}"
+                id="twitter_icon"
+                title="Share this page on Twitter"
+                alt="Share this page on Twitter"
+        >
 
-            &nbsp;
+        &nbsp;
 
-            <img
-                    src="{{ url_for('static', filename='images/linkedin_logo.svg') }}"
-                    id="linkedin_icon"
-                    title="Share this page on LinkedIn"
-                    alt="Share this page on LinkedIn"
-            >
+        <img
+                src="{{ url_for('static', filename='images/linkedin_logo.svg') }}"
+                id="linkedin_icon"
+                title="Share this page on LinkedIn"
+                alt="Share this page on LinkedIn"
+        >
 
-            &nbsp;
+        &nbsp;
 
-            <img
-                    src="{{ url_for('static', filename='images/link.svg') }}"
-                    id="clipboard_copy_icon"
-                    title="Copy this URL to the clipboard"
-                    alt="Copy this URL to the clipboard"
-            >
+        <img
+                src="{{ url_for('static', filename='images/link.svg') }}"
+                id="clipboard_copy_icon"
+                title="Copy this URL to the clipboard"
+                alt="Copy this URL to the clipboard"
+        >
 
-            <script>AddSocialShareLinks()</script>
-        </div>
+        <script>AddSocialShareLinks()</script>
 
     {% endblock %}</footer>
 

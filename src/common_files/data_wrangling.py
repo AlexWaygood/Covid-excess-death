@@ -1,108 +1,27 @@
 from __future__ import annotations
 
-import pickle
 from functools import lru_cache
-from datetime import datetime
 from contextlib import suppress
 from operator import itemgetter
-from typing import Dict, Optional, Final, NamedTuple, Callable
+from typing import Dict, Final, NamedTuple, TYPE_CHECKING
 from pandas import read_csv, notna, offsets, date_range, DataFrame
 
 from src.common_files.use_case import LOCAL_HOSTING
 import src.common_files.unchanging_constants as uc
 import src.common_files.settings as st
 
+
+if LOCAL_HOSTING:
+    from src.remembering_dict.remembering_dict_local import LocalRememberingDict as RememberingDict
+else:
+    from src.remembering_dict.remembering_dict_remote import RemoteRememberingDict as RememberingDict
+
+
+if TYPE_CHECKING:
+    from src.common_files.covid_graph_types import AllCountriesType
+
+
 COUNTRIES_WHICH_NEED_ARTICLE: Final = ('US', 'UK', 'Netherlands', 'Czech Republic', 'Philippines')
-
-
-class DatabaseCachingFunctions(NamedTuple):
-    """
-    Whether we're deploying the script locally or on the cloud,
-    the RememberingDict class needs to be able to do two things:
-    retrieve itself from a disk, and save itself to a disk.
-    """
-
-    to_disk: Callable[[RememberingDict], None]
-    from_disk: Callable[[RememberingDict], RememberingDict]
-
-
-def GetFuncs() -> DatabaseCachingFunctions:
-    """
-    The database caching functions that we need for the RememberingDict class below are different
-    depending on whether we're running the script locally on the Flask development server
-    or whether it's been deployed to the cloud.
-    """
-
-    # If we're running it on the Flask development server,
-    # we need the RememberingDict class to be implemented with the following functions
-
-    if LOCAL_HOSTING:
-        from os import path
-        FILE_PATH: Final = path.join('static', 'FT_data.pickle')
-
-        def to_file(self: RememberingDict) -> None:
-            with open(FILE_PATH, 'wb') as f:
-                pickle.dump(self, f)
-
-        # noinspection PyUnusedLocal
-        def from_file(self: RememberingDict) -> RememberingDict:
-            with open(FILE_PATH, 'rb') as f:
-                LatestDataset: RememberingDict = pickle.load(f)
-            return LatestDataset
-
-        return DatabaseCachingFunctions(to_file, from_file)
-
-    # If it's being run on Google's servers, we want the implementation to have these functions instead.
-
-    else:
-        from google.cloud.storage import Client as GoogleClient
-        from google.oauth2.service_account import Credentials as GoogleCredentials
-        from src.common_files.secret_passwords import GOOGLE_CLOUD_BUCKET_ID
-        from typing import TYPE_CHECKING
-
-        if TYPE_CHECKING:
-            from google.cloud.storage.blob import Blob
-
-        PATH_TO_CREDENTIALS: Final = 'google-auth-credentials.json'
-        FILE_PATH: Final = 'static/FT_data.pickle'
-
-        CREDENTIALS = GoogleCredentials.from_service_account_file(PATH_TO_CREDENTIALS)
-        SCOPED_CREDENTIALS = CREDENTIALS.with_scopes(['https://www.googleapis.com/auth/cloud-platform'])
-        GOOGLE_CLOUD_CLIENT = GoogleClient(credentials=SCOPED_CREDENTIALS)
-        GOOGLE_CLOUD_BUCKET = GOOGLE_CLOUD_CLIENT.get_bucket(GOOGLE_CLOUD_BUCKET_ID)
-
-        def GetGoogleBlob() -> Blob:
-            return GOOGLE_CLOUD_BUCKET.get_blob(FILE_PATH)
-
-        def to_cloud(self: RememberingDict) -> None:
-            from io import BytesIO
-            file = BytesIO()
-            pickle.dump(self, file)
-            file.seek(0)
-            GetGoogleBlob().upload_from_file(file)
-
-        # noinspection PyUnusedLocal
-        def from_cloud(self: RememberingDict) -> RememberingDict:
-            return pickle.loads(GetGoogleBlob().download_as_bytes())
-
-        return DatabaseCachingFunctions(to_cloud, from_cloud)
-
-
-class RememberingDict(dict):
-    """
-    A dict that remembers when it was created,
-    and also knows how to save itself to a disk/unpickle itself from a disk.
-    """
-
-    to_disk, from_disk = GetFuncs()
-
-    def __init__(self, data: Optional[dict] = None) -> None:
-
-        super().__init__(data if data is not None else {})
-        self.LastGithubUpdate: datetime = datetime.now()
-
-    def LastUpdateTimeReset(self) -> None:
-        self.LastGithubUpdate: datetime = datetime.now()
 
 
 def FetchFTData() -> DataFrame:
@@ -121,17 +40,15 @@ class Country:
     __slots__ = 'LookupName', 'name', 'TotalExcessDeath', 'EndOfWorstPeriod', 'PeriodType', \
                 'PeriodicExcessDeaths', 'RawExcessDeathsInWorstPeriod', 'StartOfWorstPeriod'
 
-    AllCountries: RememberingDict[str, Country] = RememberingDict()
+    AllCountries: AllCountriesType = RememberingDict()
 
     @classmethod
     def CountriesFromFile(cls) -> None:
-        # noinspection PyArgumentList
         cls.AllCountries = cls.AllCountries.from_disk()
 
     @classmethod
     def CountriesFromGithub(cls, FT_data: DataFrame) -> None:
         cls.AllCountries = RememberingDict({name: Country(name, FT_data) for name in FT_data.country.unique()})
-        # noinspection PyArgumentList
         cls.AllCountries.to_disk()
 
     @classmethod
@@ -174,6 +91,14 @@ class Country:
         if not isinstance(other, Country):
             raise NotImplementedError
         return self.TotalExcessDeath > other.TotalExcessDeath
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Country):
+            raise NotImplementedError
+        return all(getattr(self, s) == getattr(other, s) for s in self.__slots__ if s != 'PeriodicExcessDeaths')
+
+    def __hash__(self) -> int:
+        return id(self)
 
     def title(self) -> str:
         return f'The {" ".join(self.name.split()[1:])}' if 'the' in self.name else self.name

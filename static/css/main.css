@@ -1,0 +1,121 @@
+/* Load a font-family from a static file */
+
+@font-face {
+  font-family: Playfair-Display;
+  src: url('../PlayfairDisplay-VariableFont_wght.ttf');
+}
+
+/* Set the font as the default font, set the padding and margin for the body to 0. */
+
+body{
+  font-family: Playfair-Display;
+  padding: 0;
+  margin: 0;
+}
+
+/* Horizontal lines. */
+
+hr {
+  margin-top: 130px;
+  margin-bottom: 60px;
+  border-top: 2px groove DarkGoldenRod;
+}
+
+/* Default styling for buttons across the site. */
+
+.button {
+  font: bold 13px Times New Roman;
+  text-decoration: none;
+  text-weight: bold;
+  background-color: #EEEEEE;
+  color: #333333;
+  align: center;
+  padding: 10px 10px 10px 10px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+  cursor: pointer
+}
+
+.button:hover {
+  background-color: #D1CFCF;
+}
+
+/* Styling for a table that contains an array of buttons in it (used in multiple places across the site) */
+
+.MakeGraphButtonsTable {
+  margin-top: 60px;
+  display: flex;
+  justify-content: center
+}
+
+.MakeGraphButtonsTable td {
+  position: relative;
+  text-align: center;
+  margin-left: 100px;
+  margin-right: 100px;
+  width: 200px;
+}
+
+.MakeAnotherGraphButton {
+  font-size: 1.05em;
+  display: inline-block;
+  width: 150px
+}
+
+/* Styling for the 'Loading...' message that comes up when the page is loading */
+
+.loading {
+  margin-top: 100px;
+  margin-bottom: 60px;
+  width: 2000px;
+  height: 1000px;
+  display: none;
+  text-align: center;
+  text-weight: bold;
+  font: bold 22px Playfair-Display
+}
+
+/* A few abstract containers for the page as a whole */
+
+.LayoutContentContainer{
+  margin-top: 20px
+}
+
+.CentreAlignedToParent {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+
+.CenteredContent {
+  width: 50%;
+  margin: auto;
+  overflow: hidden;
+  color: #222;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+}
+
+.DataviewerCenteredContent {
+  width: 70%;
+  margin: auto;
+  overflow: hidden;
+  color: #222;
+  font-size: 18px;
+  letter-spacing: 0.3px;
+}
+
+.Centred {
+  text-align: center;
+  align: center
+}
+
+.CenteredContent p {
+  line-height: 1.8em
+}
+
+.HomePageContent{
+  margin-top: 40px
+}

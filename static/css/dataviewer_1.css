@@ -1,0 +1,23 @@
+/* Styling for table giving you options for which countries to select */
+
+.CountryTable {
+  width: 800px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 0.95em;
+}
+
+.CountryTable tr {
+  height: 50px;
+}
+
+/* Styling for the dropdown button giving you a list of countries */
+
+.selectbutton {
+  font-size: 0.9em;
+}
+
+.MakeGraphButton {
+  font-size: 0.95em;
+  display: inline-block;
+}

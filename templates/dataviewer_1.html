@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% extends "layout.html" %}
+
+    {% block additionaltags %}
+
+        <title>Pandemic excess deaths: select countries to compare                                      </title>
+        <meta property="og:title"       content="Pandemic excess deaths: select countries to compare"   />
+        <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare"   />
+        <link rel="stylesheet"   href="{{ url_for('static', filename='css/dataviewer_1.css') }}"        />
+
+    {% endblock %}
+
+    {% block content %}<div class="DataviewerCenteredContent">
+
+        <form action="" method="get" class="CentreAlignedWithParent" onsubmit="WhileLoading()">
+            <table class="CountryTable CentreAlignedWithParent">
+
+                {% for box in plotter.InputBoxes %}
+                    <tr>
+                        <td align="left">{{box.label}}:</td>
+                        <td align="left">
+
+                            <select
+                                    class="button selectbutton"
+                                    name={{box.index}}
+                                    required
+                                    autocomplete="off"
+                                    title="{{box.label}}"
+                                    oninvalid="this.setCustomValidity('{{box.label}}, or go back a step to change the number of countries in your graph')"
+                                    oninput="this.setCustomValidity('')"
+                            >
+
+                                <option value="" disabled selected hidden>--Please select a country--</option>
+
+                                {% for country in plotter.CountryNames() %}
+                                    <option value="{{country}}">{{country}}</option>
+                                {% endfor %}
+
+                            </select>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                </table>
+
+                <p></p>
+
+                <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
+                    <td>
+                        <input
+                                type="submit"
+                                class="button MakeGraphButton CentreAlignedWithParent"
+                                value="Generate my graph!"
+                        >
+                    </td>
+
+                    <td><a href="/dataviewer/" class="button MakeGraphButton CentreAlignedWithParent">
+                        Go back one step
+                    </a></td>
+
+                </tr></table>
+
+        </form>
+
+    </div>{% endblock %}
+
+</html>
