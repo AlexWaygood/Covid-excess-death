@@ -45,89 +45,112 @@
     </head>
 
     <body>
+        <div id="PageContainer">
+            <div id="EverythingExceptFooter">
 
-        <header><div class='HeaderContainer'>
-            <h1>
-                <img src="{{ url_for('static', filename='images/coronavirus.ico') }}">
-                <a href="/">Pandemic excess deaths: interactive web viewer</a>
-            </h1>
+                <header><div class='HeaderContainer'>
+                    <h1>
+                        <img src="{{ url_for('static', filename='images/coronavirus.ico') }}">
+                        <a class="BigScreenHeader" href="/">Pandemic excess deaths: interactive web viewer</a>
+                        <a class="SmallScreenHeader" href="/">Pandemic excess deaths</a>
+                    </h1>
 
-            <nav><ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('about') }}">About</a></li>
-                <li><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">Make a graph</a></li>
-            </ul></nav>
+                    <nav><ul>
+                        <li class="DesktopMenu"><a href="{{ url_for('home') }}">Home</a></li>
 
-        </div></header>
+                        <li class="DesktopMenu"><a href="{{ url_for('about') }}">About</a></li>
 
-        <div class="LayoutContentContainer">
+                        <li class="DesktopMenu"><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">
+                            Make a graph</a>
+                        </li>
 
-            <div class="loading CentreAlignedToParent"><p class="CentreAlignedToParent">
+                        <li><a id="nav_btn"><span>Hamburger Menu</span></a></li>
 
-                <img
-                        class="CentreAlignedToParent"
-                        src="{{ url_for('static', filename='images/loading.gif') }}"
-                        alt="Loading GIF"
-                        title="Please wait..."
-                />
+                        <li class="MobileMenu toggle">&nbsp;</li>
 
-                <br><br>
+                        <li class="MobileMenu toggle"><a href="{{ url_for('home') }}">Home</a></li>
 
-                Loading, please wait...
+                        <li class="MobileMenu toggle"><a href="{{ url_for('about') }}">About</a></li>
 
-            </p></div>
+                        <li class="MobileMenu toggle"><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">
+                            Make a graph</a>
+                        </li>
+                    </ul></nav>
 
-            <div class="content">
-                {% block content %}
-                {% endblock %}
+                </div></header>
+
+                <script> HamburgerMenu() </script>
+
+                <div class="LayoutContentContainer">
+
+                    <div class="loading CentreAlignedToParent"><p class="CentreAlignedToParent">
+
+                        <img
+                                class="CentreAlignedToParent"
+                                src="{{ url_for('static', filename='images/loading.gif') }}"
+                                alt="Loading GIF"
+                                title="Please wait..."
+                        />
+
+                        <br><br>
+
+                        Loading, please wait...
+
+                    </p></div>
+
+                    <div class="content">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+
+                </div>
+
             </div>
 
+            <footer>{% block footer %}
+            <p>
+            <br><br>
+
+            <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
+
+            <img
+                    src="{{ url_for('static', filename='images/facebook_logo.svg') }}"
+                    id="facebook_icon"
+                    title="Share this page on Facebook"
+                    alt="Share this page on Facebook"
+            >
+
+            &nbsp;
+
+            <img
+                    src="{{ url_for('static', filename='images/twitter_logo.svg') }}"
+                    id="twitter_icon"
+                    title="Share this page on Twitter"
+                    alt="Share this page on Twitter"
+            >
+
+            &nbsp;
+
+            <img
+                    src="{{ url_for('static', filename='images/linkedin_logo.svg') }}"
+                    id="linkedin_icon"
+                    title="Share this page on LinkedIn"
+                    alt="Share this page on LinkedIn"
+            >
+
+            &nbsp;
+
+            <img
+                    src="{{ url_for('static', filename='images/link.svg') }}"
+                    id="clipboard_copy_icon"
+                    title="Copy this URL to the clipboard"
+                    alt="Copy this URL to the clipboard"
+            >
+
+            <script>AddSocialShareLinks()</script>
+        {% endblock %}</footer>
+
         </div>
-
-        <footer>{% block footer %}
-        <p>
-        <br><br>
-
-        <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
-
-        <img
-                src="{{ url_for('static', filename='images/facebook_logo.svg') }}"
-                id="facebook_icon"
-                title="Share this page on Facebook"
-                alt="Share this page on Facebook"
-        >
-
-        &nbsp;
-
-        <img
-                src="{{ url_for('static', filename='images/twitter_logo.svg') }}"
-                id="twitter_icon"
-                title="Share this page on Twitter"
-                alt="Share this page on Twitter"
-        >
-
-        &nbsp;
-
-        <img
-                src="{{ url_for('static', filename='images/linkedin_logo.svg') }}"
-                id="linkedin_icon"
-                title="Share this page on LinkedIn"
-                alt="Share this page on LinkedIn"
-        >
-
-        &nbsp;
-
-        <img
-                src="{{ url_for('static', filename='images/link.svg') }}"
-                id="clipboard_copy_icon"
-                title="Copy this URL to the clipboard"
-                alt="Copy this URL to the clipboard"
-        >
-
-        <script>AddSocialShareLinks()</script>
-
-    {% endblock %}</footer>
-
     </body>
 
 </html>

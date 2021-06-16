@@ -12,25 +12,33 @@ header {
 
 header img{
   float: left;
-  height: 80px;
-  margin-top: -20px;
+  height: 5.8vw;
+  margin-top: -3vh;
   margin-right: 30px;
 }
 
 .HeaderContainer{
   width: 90%;
   margin: auto;
-  overflow: hidden;
+  overflow: visible;
+  min-height: 40px;
 }
 
-/* Links in the header */
+/* Text in the header -- title and navigation links */
 
 header a {
-  font-size: 1.1em;
   color: #fff;
   text-decoration: none;
   float: left;
   margin: 0;
+}
+
+header h1 .BigScreenHeader {
+  font-size: 2.5vw;
+}
+
+header h1 .SmallScreenHeader {
+  display: none
 }
 
 header a:hover{
@@ -45,14 +53,148 @@ header a:checked{
 
 header nav{
   float: right;
+  display: block;
 }
 
 header li{
+  list-style-type: none;
+}
+
+.DesktopMenu{
   float: left;
   display: inline;
   padding: 0 20px 0 20px;
   font-weight: bold;
   text-decoration: none;
   letter-spacing: 0.5px;
-  font-size: 0.95em;
+  font-size: 1.05em;
+}
+
+.MobileMenu{
+  display: none;
+  float: center;
+  padding: 0 20px 0 50px;
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  font-size: 1.05em;
+  text-align: center;
+  margin-left: -30px;
+}
+
+/* Hamburger menu, for display on mobile devices only */
+
+/* The HamburgerMenu() function in scripts.js turns this class on and off for various parts of the html */
+.toggle{ display: none; }
+
+#nav_btn{
+  display: none;
+  float: right;
+  padding: 20px;
+  cursor: pointer;
+}
+
+#nav_btn span, #nav_btn span::before, #nav_btn span::after{
+  width: 28px;
+  height: 4px;
+  display: block;
+  background: #000;
+  position: relative;
+  text-indent: -9000px;
+  -webkit-transition: all 300ms ease-in-out;
+  -moz-transition: all 300ms ease-in-out;
+  -ms-transition: all 300ms ease-in-out;
+  -o-transition: all 300ms ease-in-out;
+  transition: all 300ms ease-in-out;
+}
+
+#nav_btn span{
+  margin: 8px 0;
+}
+
+#nav_btn span::before, #nav_btn span::after{
+  content: '';
+  position: absolute;
+}
+
+#nav_btn span::before{
+  top: -8px;
+}
+
+#nav_btn span::after{
+  bottom: -8px;
+}
+
+#nav_btn.active span{
+  background-color: transparent;
+}
+
+#nav_btn.active span::before, #nav_btn.active span::after{
+  top: 0;
+}
+
+#nav_btn.active span:before{
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+#nav_btn.active span::after{
+  transform: translateY(-10px) rotate(-45deg);
+  -webkit-transform: translateY(-10px) rotate(-45deg);
+  top: 10px;
+}
+
+
+@media(max-width: 783px){
+  header img{
+    margin-top: 0;
+  }
+}
+
+@media(max-width: 680px){
+  header h1 .BigScreenHeader{
+    display: none;
+  }
+
+  header h1 .SmallScreenHeader{
+    display: inline;
+    font-size: 4.5vw;
+    margin-top: 2vh;
+  }
+
+ header img{
+    margin-top: 0vh;
+  }
+
+  header a{
+    float: none
+  }
+
+  .DesktopMenu{
+    display: none;
+  }
+
+  .MobileMenu{
+    display: block;
+    margin-top: 20px;
+  }
+
+  .toggle{
+    display: none;
+   }
+
+   header nav{
+     float: none;
+     margin: auto;
+   }
+
+  header nav ul{
+    margin-top: 40px;
+  }
+
+  #nav_btn{
+    display: block;
+    margin-top: -80px;
+    float: right;
+  }
 }

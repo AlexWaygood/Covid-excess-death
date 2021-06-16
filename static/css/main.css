@@ -35,7 +35,8 @@ hr {
   border-right: 1px solid #333333;
   border-bottom: 1px solid #333333;
   border-left: 1px solid #CCCCCC;
-  cursor: pointer
+  cursor: pointer;
+  z-index: 2;
 }
 
 .button:hover {
@@ -79,8 +80,17 @@ hr {
 
 /* A few abstract containers for the page as a whole */
 
+#PageContainer{
+  position: relative;
+  min-height: 100vh;
+}
+
+#EverythingExceptFooter {
+  padding-bottom: 10rem;    /* Footer height */
+}
+
 .LayoutContentContainer{
-  margin-top: 20px
+  margin-top: 20px;
 }
 
 .CentreAlignedToParent {
@@ -91,6 +101,7 @@ hr {
 
 .CenteredContent {
   width: 50%;
+  min-width: 410px;
   margin: auto;
   overflow: hidden;
   color: #222;
@@ -118,4 +129,16 @@ hr {
 
 .HomePageContent{
   margin-top: 40px
+}
+
+@media(max-width: 830px){
+  .HomePageContent, .CenteredContent p{
+    text-align: center;
+  }
+
+  .CenteredContent h2{
+    text-align: center;
+    margin-top: 60px;
+    margin-bottom: 40px;
+  }
 }

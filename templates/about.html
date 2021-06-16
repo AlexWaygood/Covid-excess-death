@@ -12,7 +12,7 @@
     {% endblock %}
 
     {% block content %}
-        <div class="CenteredContent AboutPage">
+        <div class="CenteredContent">
             <h1 class="Centred CentreAlignedToParent">About this site</h1>
 
             <hr>
@@ -196,20 +196,6 @@
             <p>Please do!!</p>
 
         </div>
-
-    {% endblock %}
-
-    {% block footer %}
-        <p>
-        {% for _ in range(8) %}
-            <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
-        {% endfor %}
-
-        </p>
-
-        {{ super() }}
-
-        <br><br>
 
     {% endblock %}
 

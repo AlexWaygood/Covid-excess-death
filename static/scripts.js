@@ -27,3 +27,16 @@ function AddSocialShareLinks(){
     document.getElementById("linkedin_icon").addEventListener("click", LinkedInShare);
     document.getElementById("clipboard_copy_icon").addEventListener("click", CopyLinkToClipboard);
 }
+
+function HamburgerMenu() {
+    $('#nav_btn').click(function(e) {
+        if($('.MobileMenu').is(':hidden') == true) {
+            $(this).toggleClass("active");
+            $('.MobileMenu').removeClass("toggle");
+        } else {
+            $(this).removeClass("active");
+            $('.MobileMenu').addClass("toggle");
+        }
+        e.preventDefault();
+    });
+}
