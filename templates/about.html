@@ -1,202 +1,249 @@
 <!DOCTYPE html>
 <html lang="en">
     {% extends "layout.html" %}
+    {% from "macros.html" import AdditionalTags %}
 
     {% block additionaltags %}
-
-        <meta   property="og:title"     content="Pandemic Excess Deaths: About this site"           />
-        <meta   name="twitter:title"    content="Pandemic Excess Deaths: About this site"           />
-        <meta   name="twitter:text:title"    content="Pandemic Excess Deaths: About this site"      />
-        <title> Pandemic excess deaths: About this site                                             </title>
-
+        {{ AdditionalTags("Pandemic Excess Deaths: About this site", FourthTag=true) }}
     {% endblock %}
 
-    {% block content %}
-        <div class="CenteredContent">
-            <h1 class="Centred CentreAlignedToParent">About this site</h1>
+    {% block content %}<div class="CenteredContent">
+        <h1 class="Centred CentreAlignedToParent">About this site</h1>
 
-            <hr>
+        <hr>
 
-            <h2>Who are you?</h2>
+        <h2>Who are you?</h2>
 
-            <p>
-                Hi! My name's Alex Waygood, and I'm a freelance journalist.
-                You can visit my main website <a href="http://alexwaygood.com">here.</a>
-            </p>
+        <p>
+            Hi! My name's Alex Waygood, and I'm a freelance journalist.
+            You can visit my main website <a href="http://alexwaygood.com">here.</a>
+        </p>
 
-            <h2>What's this website all about, then?</h2>
+        <h2>What's this website all about, then?</h2>
 
-            <p>
-                This website auto-generates graphs comparing excess mortality rates between countries
-                over the course of the pandemic.
-            </p>
+        <p>
+            This website auto-generates graphs comparing excess mortality rates between countries
+            over the course of the pandemic.
+        </p>
 
-            <h2>What's ‘excess mortality’??</h2>
+        <h2>What's ‘excess mortality’??</h2>
 
-            <p>
-                Excess mortality looks at the total number of deaths a country experienced over a given time period,
-                and compares it to that country's long-term trend over the past few years.
-                By doing this for the period since the COVID-19 pandemic began,
-                we can get to a way of measuring the impact of the pandemic that is truly comparable between countries.
+        <p>
+            Excess mortality looks at the total number of deaths a country experienced over a given time period,
+            and compares it to that country's long-term trend over the past few years.
+            The "excess mortality" figure is the total number of deaths
+            that exceeds the "expected" number of deaths for that timeframe.
+            By calculating this figure for the period since the COVID-19 pandemic began,
+            we can get to a way of measuring the impact of the pandemic that is truly comparable between countries.
 
-                <br><br>
+            <br><br>
 
-                The graphs on this website show excess death figures expressed as a percentage,
-                rather than the raw figures. This has the effect of adjusting for population sizes:
-                1,000 excess deaths would be far more shocking in Ireland,
-                for example, than it would be in the United States,
-                simply because there are far fewer people living in Ireland than in the United States.
-            </p>
+            Simply showing the raw number of excess deaths, however, is somewhat unfair to larger countries.
+            These countries would normally have far more deaths in any given year—
+            because they have larger populations—
+            and so, it stands to reason that they would have more excess deaths during a pandemic.
+            1,000 excess deaths would be far more shocking in Ireland,
+            for example, than it would be in the United States,
+            as there are just far fewer people living in Ireland than in the United States.
 
-            <h2>Why not just look at confirmed COVID deaths rather than ‘excess mortality’??</h2>
+            <br><br>
 
-            <p>
-                Most countries keep a count of all deaths officially confirmed to have been due to COVID-19.
-                However, these counts are often inaccurate, and usually unsuitable for comparisons between countries.
-                Countries vary widely in the number of COVID tests that they do relative to their population,
-                and there is no internationally agreed-upon definition of what constitutes a ‘COVID death’,
-                meaning many people who die of COVID will not be officially recorded as such.
+            As a result, the graphs on this website show excess death figures
+            expressed as a percentage of the "expected" number of deaths,
+            rather than the raw number of excess deaths.
+            This adjusts for the population disparities between countries.
 
-                <br><br>
+        </p>
 
-                Excess mortality isn't a perfect measure: in some countries, such as India, for example,
-                even data on the total number of deaths from all causes can be unreliable.
-                Moreover, figures for recent dates are liable to be revised upwards,
-                even in countries that have reliable statistics.
-                Finally, some countries take far longer to report statistics than others.
+        <h2>Why not just look at confirmed COVID deaths rather than ‘excess mortality’??</h2>
 
-                <br><br>
+        <p>
+            Most countries keep a count of all deaths officially confirmed to have been due to COVID-19.
+            However, these counts are often inaccurate, and usually unsuitable for comparisons between countries.
+            Countries vary widely in the number of COVID tests that they do relative to their population,
+            and there is no internationally agreed-upon definition of what constitutes a ‘COVID death’.
+            This means that many people who die of COVID will not be officially recorded as such.
 
-                Nevertheless, when it comes to making international comparisons,
-                excess mortality is still a far better metric than confirmed COVID deaths.
+            <br><br>
 
-                <br><br>
+            Excess mortality isn't a perfect measure: in some countries, such as India, for example,
+            even data on the total number of deaths from all causes can be unreliable.
+            Moreover, figures for recent dates are liable to be revised upwards,
+            even in countries that have reliable statistics.
+            Finally, some countries
 
-                To read more on the pros and cons of excess mortality as a metric,
-                and the different ways of measuring excess mortality, I can recommend
-                <a href="https://ourworldindata.org/excess-mortality-covid">Our World in Data's methodology guide.</a>
-            </p>
+            <a href="https://www.washingtonpost.com/world/2021/05/03/mexico-coronavirus-excess-death/">
+                take far longer
+            </a>
 
-            <h2>
-                But hang on. Surely if you use ‘excess mortality’,
-                that's liable to be affected by all sorts of non-COVID factors?
-            </h2>
+            to report statistics than others.
 
-            <p>
-                It's true! Excess deaths <i>could</i> be affected by anything!
+            <br><br>
 
-                There are good reasons to think carefully about what these graphs are telling us.<br><br>
-                For example, there are plausible reasons to think that lockdowns might have led
-                to some deaths in some countries.
-                Many people have suffered negative mental-health outcomes due to loneliness,
-                and still more have put off visits to the doctor that might have seemed inessential at the time.<br><br>
+            Making international comparisons is a tricky business
 
-                There are also plausible reasons to think that lockdowns might have prevented
-                some non-COVID deaths that might otherwise have occurred.
-                Reducing the number of cars on the road, for example,
-                could plausibly have led both to less pollution and to fewer traffic accidents.<br><br>
+            <a href="https://www.bbc.co.uk/news/52311014">whatever metric you use</a>,
 
-                And overall mortality rates are impacted by other diseases, too.
-                If a country has experienced a major surge or decline in another infectious disease,
-                this will clearly also have a large impact on their mortality statistics for 2020-2021.
-                This point isn't merely hypothetical: flu rates have plummeted over the past year-and-a-bit,
-                due to lockdowns around the world.<br><br>
+            so these graphs can only tell you so much.
+            Nevertheless, excess mortality--where the statistics are available--
+            is generally a far better metric than confirmed COVID deaths.
+            These graphs are a pretty good place to start.
 
-                Nonetheless, for the vast majority of countries,
-                a declining flu rate and fewer traffic accidents will not have been nearly enough
-                to have fully offset the death toll of COVID-19.
-                As such, while it's important to see these graphs as a metric of a country's overall pandemic
-                response—rather than simply as ‘how many died of COVID’ over a given period—they remain, arguably,
-                one of our most useful tools for making international comparisons regarding the impact of COVID-19.
-            </p>
+            <br><br>
 
-            <h2>Where are you getting your data from?</h2>
+            To read more on the pros and cons of excess mortality as a metric,
+            and the different ways of measuring excess mortality, I can recommend Our World in Data's
+            <a href="https://ourworldindata.org/excess-mortality-covid">methodology guide.</a>
+        </p>
 
-            <p>
-                None of the data used on this site was collected by me;
-                all credit must go to the incredible team of data journalists at the Financial Times,
-                both for collecting the data and for making it
-                <a href="https://github.com/Financial-Times/coronavirus-excess-mortality-data">open-source</a>
-                for the world to see. This site would not be possible, otherwise!
+        <h2>
+            But hang on. Surely if you use ‘excess mortality’,
+            that's liable to be affected by all sorts of non-COVID factors?
+        </h2>
 
-                <br><br>
+        <p>
+            It's true! Excess deaths <i>could</i> be affected by anything!
 
-                I would encourage anybody who enjoys this site to read the
-                <a href="https://www.ft.com/content/a2901ce8-5eb7-4633-b89c-cbdf5b386938" >FT's</a>
-                <a href="https://www.ft.com/content/6bd88b7d-3386-4543-b2e9-0d5c6fac846c" >coverage</a> on excess deaths,
-                which they have made entirely free to read.
-            </p>
+            There are good reasons to think carefully about what these graphs are telling us.
 
-            <h2>Why aren't all countries in the FT's dataset?</h2>
+            <br><br>
 
-            <p>
-                Not all countries report excess mortality statistic promptly, and some don't report figures at all!
-                The FT can only give figures for excess mortality when they are available (although there has been a
+            For example, there are plausible reasons to think that lockdowns might have led
+            to some deaths in some countries.
+            Many people have suffered negative mental-health outcomes due to loneliness,
+            and still more have put off visits to the doctor that might have seemed inessential at the time.
 
-                <a href="https://www.economist.com/briefing/2021/05/15/there-have-been-7m-13m-excess-deaths-worldwide-during-the-pandemic" >
-                    recent attempt
-                </a>
+            <br><br>
 
-                by <i>The Economist</i> to model excess deaths in countries where official figures are not available,
-                which is well worth a look).
-            </p>
+            There are also plausible reasons to think that lockdowns might have prevented
+            some non-COVID deaths that might otherwise have occurred.
+            Reducing the number of cars on the road, for example,
+            could plausibly have led both to less pollution and to fewer traffic accidents.
 
-            <h2>How are you measuring ‘excess mortality’?</h2>
+            <br><br>
 
-            <p>
-                I take the FT's figure for the number of deaths in a given week for a given country,
-                and divide that by the FT's figure for the number of deaths that country would "expect" to experience
-                in that week of the year, based on the FT's analysis of the long-term mortality trends in that country.
-            </p>
+            And overall mortality rates are impacted by other diseases, too.
+            If a country has experienced a major surge or decline in another infectious disease,
+            this will clearly also have a large impact on their mortality statistics for 2020-2021.
+            This point isn't just hypothetical. Flu rates have plummeted over the past year-and-a-bit,
+            due to lockdowns around the world.
 
-            <h2>Why do the data series for different countries start and end on different dates?</h2>
+            <br><br>
 
-            <p>
-                The data series for a country starts at the point at which that country hit 100 confirmed cases of COVID-19.
-                Prior to this point, although it is possible that COVID-19 may have been circulating
-                in any given country undetected, any fluctuations in mortality figures cannot reliably be said
-                to have been caused by COVID-19.
+            Nonetheless, for the vast majority of countries,
+            a declining flu rate and fewer traffic accidents will not have been nearly enough
+            to have fully offset the death toll of COVID-19.
 
-                <br><br>
+            <br><br>
 
-                Each country's data series ends at the latest available data point in the FT's dataset:
-                different countries report this data on different timetables,
-                so there may be much more up-to-date data for some countries than for others.
-            </p>
+            So it's important to see these graphs as a metric of a country's overall pandemic
+            response—rather than simply as ‘how many died of COVID’ over a given period.
+            However, they remain, arguably,
+            one of our most useful tools for making international comparisons regarding the impact of COVID-19.
+        </p>
 
-            <h2>How are you making these graphs/this website?</h2>
+        <h2>Where are you getting your data from?</h2>
 
-            <p>
-                All the HTML and CSS on this site has been manually coded by me.
-                The backend runs entirely in Python, using the Flask library to handle requests to the server.
-                The graphs are generated on the server side using the pandas and matplotlib Python libraries,
-                while the lines on the graphs are smoothed using a cubic interpolation function from the SciPy library.
-                The web app is hosted by Google App Cloud.
-            </p>
+        <p>
+            None of the data used on this site was collected by me.
+            All credit must go to the incredible team of data journalists at the Financial Times,
+            both for collecting the data and for making it
+            <a href="https://github.com/Financial-Times/coronavirus-excess-mortality-data">open-source</a>
+            for the world to see. This site would not be possible, otherwise!
 
-            <h2>Can we see the code behind this website and the graphs?</h2>
+            <br><br>
 
-            <p>Sure! It's all <a href="https://github.com/AlexWaygood/Covid-excess-death/">right here</a>.</p>
+            I would encourage anybody who enjoys this site to read the
+            <a href="https://www.ft.com/content/a2901ce8-5eb7-4633-b89c-cbdf5b386938" >FT's</a>
+            <a href="https://www.ft.com/content/6bd88b7d-3386-4543-b2e9-0d5c6fac846c" >coverage</a>
+            on excess deaths, which they have made entirely free to read.
+        </p>
 
-            <h2>
-                Couldn't you have done [feature of this website] better/more effectively
-                if you'd used a little more Javascript?
-            </h2>
+        <h2>Why aren't all countries in the FT's dataset?</h2>
 
-            <p>
-                Probably! But I know Python very well, and don't really know Javascript much.
+        <p>
+            Not all countries report excess mortality statistic promptly, and some don't report figures at all!
+            The FT can only give figures for excess mortality when they are available (although there has been a
 
-                <br><br>
+            <a href="https://www.economist.com/briefing/2021/05/15/there-have-been-7m-13m-excess-deaths-worldwide-during-the-pandemic" >
+                recent attempt
+            </a>
 
-                I should probably learn Javascript a little more, but that's a project for another day :)
-            </p>
+            by <i>The Economist</i> to model excess deaths in countries where official figures are not available,
+            which is well worth a look).
+        </p>
 
-            <h2>Hey, you seem cool, can I employ you?!</h2>
+        <h2>How are you measuring ‘excess mortality’?</h2>
 
-            <p>Please do!!</p>
+        <p>
+            I take the FT's figure for the number of deaths in a given week for a given country,
+            and divide that by the FT's figure for the number of deaths that country would "expect" to experience
+            in that week of the year, based on the FT's analysis of the long-term mortality trends in that country.
+        </p>
 
-        </div>
+        <h2>Why do the data series for different countries start and end on different dates?</h2>
 
-    {% endblock %}
+        <p>
+            The FT's data series for a country starts at the point
+            at which that country hit 100 confirmed cases of COVID-19.
+            Prior to this point, although it is possible that COVID-19 may have been circulating
+            in any given country undetected, any fluctuations in mortality figures cannot reliably be said
+            to have been caused by COVID-19.
+
+            <br><br>
+
+            Each country's data series ends at the latest available data point in the FT's dataset.
+            Different countries report this data on different timetables,
+            so there may be much more up-to-date data for some countries than for others.
+        </p>
+
+        <h2>How are you making these graphs/this website?</h2>
+
+        <p>
+            All the HTML and CSS on this site has been manually coded by me.
+            The backend runs entirely in Python, using the
+            <a href="https://flask.palletsprojects.com/en/2.0.x/">Flask library</a>
+            to handle requests to the server.
+            The graphs are generated on the server side using the
+
+            <a href="https://pandas.pydata.org/">pandas</a>
+
+            and
+
+            <a href="https://matplotlib.org/">matplotlib</a>
+
+            Python libraries, while the lines on the graphs are smoothed using a
+
+            <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html#scipy.interpolate.interp1d">
+                cubic interpolation function
+            </a>
+
+            from the Python SciPy library. The web app is hosted by
+
+            <a href="https://cloud.google.com/appengine">Google App Engine</a>.
+        </p>
+
+        <h2>Can we see the code behind this website and the graphs?</h2>
+
+        <p>Sure! It's all <a href="https://github.com/AlexWaygood/Covid-excess-death/">right here</a>.</p>
+
+        <h2>
+            Couldn't you have done [feature of this website] better/more effectively
+            if you'd used a little more Javascript?
+        </h2>
+
+        <p>
+            Probably! But I know Python very well, and don't really know Javascript much.
+
+            <br><br>
+
+            I should probably learn Javascript a little more, but that's a project for another day :)
+        </p>
+
+        <h2>Hey, you seem cool, can I employ you?!</h2>
+
+        <p>Please do!!</p>
+
+    </div>{% endblock %}
 
 </html>

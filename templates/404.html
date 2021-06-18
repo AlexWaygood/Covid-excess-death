@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
     {% extends "layout.html" %}
+    {% from "macros.html" import AdditionalTags, Button %}
 
     {% block additionaltags %}
-        <meta   property="og:title"         content="404 not found"     />
-        <meta   name="twitter:title"        content="404 not found"     />
-        <meta   name="twitter:text:title"   content="404 not found"     />
-        <title> 404 not found                                           </title>
+        {{ AdditionalTags("404 not found", FourthTag=true) }}
     {% endblock %}
 
     {% block content %}
         <div class="CentreAlignedToParent Centred">
             <h1>It doesn't look like this page exists :(</h1>
-            <a href="/" class="button CentreAlignedToParent">Head home</a>
+            {{ Button(url_for('home'), "Head home", class="CentreAlignedToParent") }}
         </div>
     {% endblock %}
 

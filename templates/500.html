@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     {% extends "layout.html" %}
+    {% from "macros.html" import AdditionalTags, MultipleButtons with context %}
 
     {% block additionaltags %}
-        <meta   property="og:title"   content="500 server error"        />
-        <meta   name="twitter:title"  content="500 server error"        />
-        <meta   name="twitter:text:title"  content="500 server error"   />
-        <title> 500 server error                                        </title>
+        {{ AdditionalTags("500 server error", FourthTag=true) }}
     {% endblock %}
 
     {% block content %}
@@ -14,8 +12,14 @@
             <h1>Hmm, looks like there was a server error here :(</h1>
             <p>The server probably had difficulty making a graph with one or more of your country selections.</p>
             <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
-                <td><a href="/dataviewer/" class="button MakeGraphButton CentreAlignedToParent">Make a graph</a></td>
-                <td><a href="/" class="button MakeGraphButton CentreAlignedToParent">Head home</a></td>
+
+                {% set ButtonVals = (
+                    (url_for('dataviewer'),     "Make a graph",     {'onclick': 'WhileLoading()'}),
+                    (url_for('home'),           "Head home",        {})
+                ) %}
+
+                {{ MultipleButtons(ButtonVals, "MakeGraphButton CentreAlignedWithParent") }}
+
             </tr></table>
 
         </div>

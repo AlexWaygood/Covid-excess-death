@@ -25,6 +25,9 @@ if TYPE_CHECKING:
 
 
 app: Final = Flask(__name__, static_url_path='/static/', static_folder='static')
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
+
 plotter: Optional[WebGraphPlotter] = None
 Cached_pages: Optional[ExpiringDict[str, str]] = None
 

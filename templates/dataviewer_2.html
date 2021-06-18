@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
     {% extends "layout.html" %}
+    {% from "macros.html" import AdditionalTags, StyleSheetTag, MultipleButtons with context %}
 
     {% block additionaltags %}
 
-        <link rel="stylesheet"  href="{{ url_for('static', filename='css/dataviewer_2.css') }}"         />
+        {{ StyleSheetTag('dataviewer_2') }}
 
         {% if plotter.RandomGraphSelected %}
-            <title> Pandemic excess deaths: generate a random graph                                     </title>
-            <meta   property="og:title"       content="Pandemic excess deaths: generate a random graph" />
-            <meta   name="twitter:title"      content="Pandemic excess deaths: generate a random graph" />
-
+            {{ AdditionalTags("Pandemic excess deaths: generate a random graph", FourthTag=True) }}
         {% else %}
-            <title> {{plotter.ImageTitle}}                                                              </title>
-            <meta   property="og:title"       content="{{plotter.ImageTitle}}"                          />
-            <meta   name="twitter:title"      content="{{plotter.ImageTitle}}"                          />
-
+            {{ AdditionalTags(plotter.ImageTitle, FourthTag=True) }}
         {% endif %}
 
     {% endblock %}
@@ -40,22 +35,13 @@
         </div>
 
         <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
+            {% set ButtonVals = (
+                (plotter.img,           "Download graph",       {'download': plotter.ImageTitle}),
+                (url_for('dataviewer'), "Make another graph",   {}),
+                (url_for('about'),      "About these graphs",   {})
+            ) %}
 
-            <td><a
-                        href="{{plotter.img}}"
-                        class="button MakeAnotherGraphButton CentreAlignedToParent"
-                        download="{{plotter.ImageTitle}}"
-                >
-                    Download graph
-            </a></td>
-
-            <td><a href="{{ url_for('dataviewer') }}" class="button MakeAnotherGraphButton CentreAlignedToParent">
-                Make another graph
-            </a></td>
-
-            <td><a href="{{ url_for('about') }}" class="button MakeAnotherGraphButton CentreAlignedToParent">
-                About these graphs
-            </a></td>
+            {{ MultipleButtons(ButtonVals, "MakeAnotherGraphButton CentreAlignedToParent") }}
 
         </tr></table>
 

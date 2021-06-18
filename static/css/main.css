@@ -57,12 +57,18 @@ hr {
   margin-left: 100px;
   margin-right: 100px;
   width: 200px;
+  padding: 10px 0px 10px 0px;
 }
 
 .MakeAnotherGraphButton {
   font-size: 1.05em;
   display: inline-block;
   width: 150px
+}
+
+.MakeGraphButton {
+  font-size: 0.95em;
+  display: inline-block;
 }
 
 /* Styling for the 'Loading...' message that comes up when the page is loading */
@@ -85,8 +91,18 @@ hr {
   min-height: 100vh;
 }
 
-#EverythingExceptFooter {
-  padding-bottom: 10rem;    /* Footer height */
+/* Footer height is responsive >> */
+
+@media screen and (min-width: 401px){
+  #EverythingExceptFooter{
+    padding-bottom: 10rem
+  }
+}
+
+@media screen and (max-width: 400px){
+  #EverythingExceptFooter{
+    padding-bottom: 15rem
+  }
 }
 
 .LayoutContentContainer{
@@ -97,16 +113,6 @@ hr {
   position: absolute;
   left: 50%;
   transform: translate(-50%, 0);
-}
-
-.CenteredContent {
-  width: 50%;
-  min-width: 410px;
-  margin: auto;
-  overflow: hidden;
-  color: #222;
-  font-size: 18px;
-  letter-spacing: 0.3px;
 }
 
 .DataviewerCenteredContent {
@@ -123,20 +129,40 @@ hr {
   align: center
 }
 
+.CenteredContent {
+  width: max(50%, min(550px, 90%));
+  margin: auto;
+  overflow: hidden;
+  color: #222;
+  letter-spacing: 0.3px;
+}
+
 .CenteredContent p {
-  line-height: 1.8em
+  line-height: 1.8em;
 }
 
-.HomePageContent{
-  margin-top: 40px
+@media screen and (min-width: 831px){
+  .CenteredContent p{
+    text-align: left;
+    font-size: 18px;
+  }
+
+  .Centered Content h2{
+    font-size: 1.5em;
+    text-align: left;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
 }
 
-@media(max-width: 830px){
-  .HomePageContent, .CenteredContent p{
+@media screen and (max-width: 830px){
+  .CenteredContent p{
     text-align: center;
+    font-size: 16px;
   }
 
   .CenteredContent h2{
+    font-size: 1.3em;
     text-align: center;
     margin-top: 60px;
     margin-bottom: 40px;

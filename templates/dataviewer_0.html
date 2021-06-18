@@ -2,77 +2,67 @@
 <html lang="en">
 
     {% extends "layout.html" %}
+    {% from "macros.html" import AdditionalTags, StyleSheetTag, Button, SubmitButton %}
 
     {% block additionaltags %}
 
-        <title>Pandemic excess deaths: select countries to compare                                      </title>
-        <meta property="og:title"       content="Pandemic excess deaths: select countries to compare"   />
-        <meta name="twitter:title"      content="Pandemic excess deaths: select countries to compare"   />
-        <link rel="stylesheet"  href="{{ url_for('static', filename='css/dataviewer_0.css') }}"         />
+        {{ AdditionalTags("Pandemic Excess Deaths: select countries to compare", FourthTag=true)    }}
+        {{ StyleSheetTag('dataviewer_0')                                                    }}
 
     {% endblock %}
 
-    {% block content %}
+    {% block content %}<div class="DataviewerCenteredContent">
 
-        <div class="DataviewerCenteredContent">
+        {% if FromRedirect %}
 
-            {% if FromRedirect %}
+            <h2 class="Centred FromRedirectHeader">It looks like you made a mistake when entering a URL!</h2>
 
-                <h2 class="Centred FromRedirectHeader">It looks like you made a mistake when entering a URL!</h2>
+            <p class="Centred">
+                You either entered an invalid number of countries,
+                or tried to enter a country that isn't in the FT's dataset.<br>
+                Either enter the URL again, or complete the form manually here.
+            <hr>
+            <br>
 
-                <p class="Centred">
-                    You either entered an invalid number of countries,
-                    or tried to enter a country that isn't in the FT's dataset.<br>
-                    Either enter the URL again, or complete the form manually here.
-                <hr>
-                <br>
+        {% endif %}
 
-            {% endif %}
+        <p class="Centred">To make a custom graph, please specify how many countries you want to compare:</p>
 
-            <p class="Centred">To make a custom graph, please specify how many countries you want to compare:</p>
+        <form action="" method="get" class="HowManyCountriesForm CentreAlignedToParent" onsubmit="WhileLoading()">
 
-                <form action="" method="get" class="HowManyCountriesForm CentreAlignedToParent" onsubmit="WhileLoading()">
+            <table>
 
-                    <table>
+                <tr>
+                    {% for i in range(1, 6) %}
+                        <td> <input type="radio" id={{i}} name="HowManyCountries" value={{i}} class="RadioButton"> </td>
+                    {% endfor %}
+                </tr>
 
-                        <tr>
-                            {% for i in range(1, 6) %}
-                                <td>
-                                    <input type="radio" id={{i}} name="HowManyCountries" value={{i}} class="RadioButton">
-                                </td>
-                            {% endfor %}
-                        </tr>
+                <tr>
+                    {% for i in range(1, 6) %}
+                        <td> <label for={{i}}>{{i}}</label> </td>
+                    {% endfor %}
+                </tr>
 
-                        <tr>
-                            {% for i in range(1, 6) %}
-                                <td>
-                                    <label for={{i}}>{{i}}</label>
-                                </td>
-                            {% endfor %}
-                        </tr>
+            </table>
 
-                    </table>
+            <p>{{ SubmitButton("Submit") }}</p>
 
-                    <p><input type="submit" value="Submit" class="button"></p>
+        </form>
 
-                </form>
+        <p class="Centred">
 
-                <p class="Centred">
+            <br><br><br><br><br><br><br><br>
+            Alternatively, click the button below to generate a random graph!
+            <br><br>
 
-                    <br><br><br><br><br><br><br><br>
-                    Alternatively, click the button below to generate a random graph!
-                    <br><br>
+            {{ Button(
+                url_for('dataviewer', HowManyCountries='random'),
+                "Generate random graph",
+                class="CentreAlignedToParent",
+                onclick="WhileLoading()"
+            ) }}
 
-                    <a
-                            href="/dataviewer/?HowManyCountries=random"
-                            class="button CentreAlignedToParent"
-                            onclick="WhileLoading()"
-                    >
-                        Generate random graph
-                    </a>
-
-                </p>
-        </div>
-
-    {% endblock %}
+        </p>
+    </div>{% endblock %}
 </html>

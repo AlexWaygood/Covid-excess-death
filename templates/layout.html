@@ -1,46 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% from "macros.html" import Navigation_Bar, SocialImage, Image, StyleSheetTag, SocialTag with context %}
+
+    {% set ImageURL %}      {{ request.url_root }}{{ url_for('social_media_link_preview') }}    {% endset %}
+
+    {% set TwitterAndFacebookTags = (
+        ("Alex Waygood's interactive data viewer",              'description',  'description'   ),
+        ('Pandemic Excess Deaths: Interactive Data Viewer',     'site_name',    'image:alt'     ),
+        (1418,                                                  'image:width',  'image:width'   ),
+        (ImageURL,                                              'image',        'image:src'     )
+    ) %}
+
+    {% set FacebookTags = (
+        ('https://www.facebook.com/alexwaygoodblog/',           'article:publisher'             ),
+        ('https://www.facebook.com/alex.waygood/',              'article:author'                ),
+        (request.url,                                           'url'                           ),
+        ('en_GB',                                               'locale'                        ),
+        ('article',                                             'type'                          ),
+    ) %}
+
+    {% set TwitterAccount = "@CovidGraph" %}
+
+    {% set TwitterTags = (
+        (TwitterAccount,                                        'creator'                       ),
+        (TwitterAccount,                                        'site'                          ),
+        ('summary_large_image',                                 'card'                          ),
+        (request.url_root,                                      'domain'                        )
+    ) %}
+
+    {% set JavascriptURLs = (
+        "https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js",
+        url_for('static', filename='scripts.js')
+    ) %}
 
     <head>
-         <meta charset="UTF-8">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-         <meta property="og:description"     content="Alex Waygood's interactive data viewer"                   />
-         <meta property="og:type"            content="article"                                                  />
-         <meta property="og:article:author"  content="Alex Waygood"                                             />
+        {% for content, FB_Name, TwitterName in TwitterAndFacebookTags %}
+            {{ SocialTag(content, FB_Name=FacebookName, TwitterName=TwitterName) }}
+        {% endfor %}
 
-         <meta property="og:site_name"       content="Pandemic Excess Deaths: Interactive Data Viewer"          />
-         <meta property="og:locale"          content="en_GB"                                                    />
-         <meta property="og:url"             content="{{request.url}}"                                          />
+        {% for content, FB_Name in FacebookTags %}
+            {{ SocialTag(content, FB_Name=FacebookName) }}
+        {% endfor %}
 
-         <meta property="og:image"           content="{{ url_for('social_media_link_preview') }}"               />
-         <meta property="og:image:width"     content="1418"                                                     />
-         <meta property="og:image:height"    content="744"                                                      />
+        {% for content, TwitterName in TwitterTags %}
+            {{ SocialTag(content, TwitterName=TwitterName) }}
+        {% endfor %}
 
-         <meta name="twitter:image:src"      content="{{ url_for('social_media_link_preview') }}"               />
-         <meta name="twitter:image:width"    content="1418"                                                     />
-         <meta name="twitter:image:height"   content="744"                                                      />
-         <meta name="twitter:image:alt"      content="Pandemic Excess Deaths: Interactive Data Viewer"          />
+        <meta
+                name="description"
+                content="Alex Waygood's interactive data viewer generates graphs showing
+                excess mortality rates between countries over the course of the pandemic,
+                using data collated and shared by the Financial Times"
+        />
 
-         <meta name="twitter:description"    content="Alex Waygood's interactive data viewer"                   />
-         <meta name="twitter:creator"        content="@CovidGraph"                                              />
-         <meta name="twitter:site"           content="@CovidGraph"                                              />
-         <meta name="twitter:card"           content="summary_large_image"                                      />
-         <meta name="twitter:domain"         content="{{ request.url_root }}"                                   />
+        {% for StyleSheetName in ('main', 'header', 'footer') %}
+            {{ StyleSheetTag(StyleSheetName) }}
+        {% endfor %}
 
-         <meta name="description"            content="Alex Waygood's interactive data viewer"                   />
-         <meta property="article:author"     content="https://www.facebook.com/alexwaygoodblog/"                />
+        <link rel="shortcut icon"           href="{{ url_for('static', filename='images/coronavirus.ico') }}"   />
 
-         <link rel="stylesheet"              href="{{ url_for('static', filename='css/main.css') }}"            />
-         <link rel="stylesheet"              href="{{ url_for('static', filename='css/header.css') }}"          />
-         <link rel="stylesheet"              href="{{ url_for('static', filename='css/footer.css') }}"          />
-         <link rel="shortcut icon"           href="{{ url_for('static', filename='images/coronavirus.ico') }}"  />
+        {% for url in JavascriptURLs %}
+            <script type="text/javascript" src="{{url}}"></script>
+        {% endfor %}
 
-         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js">          </script>
-         <script type="text/javascript" src="https://storage.googleapis.com/104623555177204622198/static/scripts.js">    </script>
-         <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}">                            </script>
-
-         {% block additionaltags %}
-         {% endblock %}
+        {% block additionaltags %}
+        {% endblock %}
 
     </head>
 
@@ -50,31 +77,16 @@
 
                 <header><div class='HeaderContainer'>
                     <h1>
-                        <img src="{{ url_for('static', filename='images/coronavirus.ico') }}">
+                        {{ Image('coronavirus.ico', 'Coronavirus icon') }}
                         <a class="BigScreenHeader" href="/">Pandemic excess deaths: interactive web viewer</a>
                         <a class="SmallScreenHeader" href="/">Pandemic excess deaths</a>
                     </h1>
 
                     <nav><ul>
-                        <li class="DesktopMenu"><a href="{{ url_for('home') }}">Home</a></li>
-
-                        <li class="DesktopMenu"><a href="{{ url_for('about') }}">About</a></li>
-
-                        <li class="DesktopMenu"><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">
-                            Make a graph</a>
-                        </li>
-
+                        {{ Navigation_Bar("DesktopMenu") }}
                         <li><a id="nav_btn"><span>Hamburger Menu</span></a></li>
-
                         <li class="MobileMenu toggle">&nbsp;</li>
-
-                        <li class="MobileMenu toggle"><a href="{{ url_for('home') }}">Home</a></li>
-
-                        <li class="MobileMenu toggle"><a href="{{ url_for('about') }}">About</a></li>
-
-                        <li class="MobileMenu toggle"><a href="{{ url_for('dataviewer') }}" onclick="WhileLoading()">
-                            Make a graph</a>
-                        </li>
+                        {{ Navigation_Bar("MobileMenu toggle") }}
                     </ul></nav>
 
                 </div></header>
@@ -85,12 +97,7 @@
 
                     <div class="loading CentreAlignedToParent"><p class="CentreAlignedToParent">
 
-                        <img
-                                class="CentreAlignedToParent"
-                                src="{{ url_for('static', filename='images/loading.gif') }}"
-                                alt="Loading GIF"
-                                title="Please wait..."
-                        />
+                        {{ Image('loading.gif', 'Loading GIF', 'Please wait...', class='CentreAlignedToParent') }}
 
                         <br><br>
 
@@ -108,47 +115,23 @@
             </div>
 
             <footer>{% block footer %}
-            <p>
-            <br><br>
+                <p>
+                <br><br>
 
-            <a href="http://alexwaygood.com">© Alex Waygood 2021</a> &nbsp; | &nbsp; share via &nbsp;
+                {% set FooterCredit %}      <a href="http://alexwaygood.com">© Alex Waygood 2021</a>       {% endset %}
 
-            <img
-                    src="{{ url_for('static', filename='images/facebook_logo.svg') }}"
-                    id="facebook_icon"
-                    title="Share this page on Facebook"
-                    alt="Share this page on Facebook"
-            >
+                <div id="BigScreenFooter">{{ FooterCredit }}&nbsp; | &nbsp; share via &nbsp;</div>
+                <div id="SmallScreenFooter">{{FooterCredit}}<br><br>Share via &nbsp;</div>
 
-            &nbsp;
+                {% for site in ('Facebook', 'Twitter', 'LinkedIn') %}
+                    {{ SocialImage(site) }}
+                    &nbsp;
+                {% endfor %}
 
-            <img
-                    src="{{ url_for('static', filename='images/twitter_logo.svg') }}"
-                    id="twitter_icon"
-                    title="Share this page on Twitter"
-                    alt="Share this page on Twitter"
-            >
+                {{ Image('link.svg', 'Copy this URL to the clipboard', id='clipboard_copy_icon') }}
 
-            &nbsp;
-
-            <img
-                    src="{{ url_for('static', filename='images/linkedin_logo.svg') }}"
-                    id="linkedin_icon"
-                    title="Share this page on LinkedIn"
-                    alt="Share this page on LinkedIn"
-            >
-
-            &nbsp;
-
-            <img
-                    src="{{ url_for('static', filename='images/link.svg') }}"
-                    id="clipboard_copy_icon"
-                    title="Copy this URL to the clipboard"
-                    alt="Copy this URL to the clipboard"
-            >
-
-            <script>AddSocialShareLinks()</script>
-        {% endblock %}</footer>
+                <script>AddSocialShareLinks()</script>
+            {% endblock %}</footer>
 
         </div>
     </body>

@@ -1,14 +1,14 @@
 /* Styling for table giving you options for which countries to select */
 
 .CountryTable {
-  width: 800px;
   margin-top: 20px;
   margin-bottom: 20px;
+  margin: auto;
   font-size: 0.95em;
 }
 
-.CountryTable tr {
-  height: 50px;
+.CountryTable td{
+  padding: 0px 20px 20px 20px;
 }
 
 /* Styling for the dropdown button giving you a list of countries */
@@ -17,7 +17,30 @@
   font-size: 0.9em;
 }
 
-.MakeGraphButton {
-  font-size: 0.95em;
-  display: inline-block;
+@media screen and (max-width: 761px){
+  .DesktopForm {
+    display: none;
+  }
+
+  .MobileForm {
+    display: block;
+  }
+
+  td {
+    max-width: 290px;
+  }
+
+  .BiggerRow td{
+    padding: 40px 20px 20px 20px;
+  }
+}
+
+@media screen and (min-width: 761px){
+  .DesktopForm {
+    display: block;
+  }
+
+  .MobileForm {
+    display: none;
+  }
 }

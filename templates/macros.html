@@ -1,0 +1,186 @@
+{% macro Navigation_Link(class, endpoint, name, script) %}
+    <li class="{{class}}"><a href="{{ url_for(endpoint) }}" onclick="{{script}}">{{name}}</a></li>
+{% endmacro %}
+
+
+{% macro Navigation_Bar(class) %}
+    {{ Navigation_Link(class, 'home', 'Home', '') }}
+    {{ Navigation_Link(class, 'about', 'About', '') }}
+    {{ Navigation_Link(class, 'dataviewer', 'Make a graph', 'WhileLoading()') }}
+{% endmacro %}
+
+
+{% macro Image(file, alt, title='', class='', id='') %}
+    {% set filepath = 'images/%s' | format(file) %}
+
+    <img
+            id="{{ id }}"
+            class="{{ class }}"
+            src="{{ url_for('static', filename=filepath) }}"
+            title="{{ title if title else alt }}"
+            alt="{{ alt }}"
+    />
+
+{% endmacro %}
+
+
+{% macro SocialImage(site) %}
+    {% set filepath = 'images/%s_logo.svg' | format(site) %}
+
+    <img
+            src="{{ url_for('static', filename=filepath) }}"
+            id="{{site}}_icon"
+            title="Share this page on {{site}}"
+            alt="Share this page on {{site}}"
+    >
+
+{% endmacro %}
+
+
+{% macro StyleSheetTag(file) %}
+    {% set filepath = "css/%s.css" | format(file) %}
+    <link rel="stylesheet" href="{{ url_for('static', filename=filepath) }}" />
+{% endmacro %}
+
+
+{% macro AdditionalTags(Title, FourthTag=false) %}
+
+    <meta   property="og:title"         content="{{ Title }}"     />
+    <meta   name="twitter:title"        content="{{ Title }}"     />
+    <meta   name="twitter:text:title"   content="{{ Title }}"     />
+
+    {% if FourthTag %}
+        <title> {{ Title }} </title>
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro Button(url, text, class="", download="", onclick="") %}
+    {% set Class = "button %s" | format(class) %}
+
+    {% if download %}
+        <a href="{{url}}" class="{{Class}}" download="{{download}}" onclick="{{onclick}}"> {{ text }} </a>
+    {% else %}
+        <a href="{{url}}" class="{{Class}}" onclick="{{onclick}}"> {{ text }} </a>
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro MultipleButtons(ButtonVals, class) %}
+    {% for url, text, KwargDict in ButtonVals %}
+        <td>{{ Button(url, text, class=class, **KwargDict) }}</td>
+    {% endfor %}
+{% endmacro %}
+
+
+{% macro SocialTag(content, TwitterName='', FB_Name='') %}
+
+    {% if TwitterName %}
+        <meta name="twitter:{{TwitterName}}" content="{{content}}" />
+    {% endif %}
+
+    {% if FB_Name %}
+        <meta property="og:{{FB_Name}}" content="{{content}}" />
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro SubmitButton(value, class="") %}
+    <input
+        type="submit"
+        class="button {{class}}"
+        value="{{value}}"
+    >
+{% endmacro %}
+
+
+{% macro DropdownMenu(box, InvalidMessage, plotter, align) %}
+    <td align="{{align}}">
+        <select
+                class="button selectbutton"
+                name={{box.index}}
+                required
+                autocomplete="off"
+                title="{{box.label}}"
+                oninvalid="this.setCustomValidity('{{InvalidMessage}}')"
+                oninput="this.setCustomValidity('')"
+        >
+
+            <option value="" disabled selected hidden>--Please select a country--</option>
+
+            {% for country in plotter.CountryNames %}
+                <option value="{{country}}">{{country}}</option>
+            {% endfor %}
+
+        </select>
+    </td>
+{% endmacro %}
+
+
+{% macro LabelCell(box, align) %}
+    <td align="{{align}}">{{box.label}}:</td>
+{% endmacro %}
+
+
+
+{% macro SelectCountryForm(plotter, DesktopForm=true) %}
+
+    {% set AdditionalClass %} {{'DesktopForm' if DesktopForm else 'MobileForm' }} {% endset %}
+
+    {% set SelectCountrySubmit %}
+        <td> {{ SubmitButton("Generate my graph!", "MakeGraphButton CentreAlignedWithParent") }} </td>
+    {% endset %}
+
+
+    {% set GoBackOneStep %}
+        <td>
+            {{ Button(
+                url_for('dataviewer'),
+                "Go back one step",
+                class="MakeGraphButton CentreAlignedWithParent"
+            ) }}
+        </td>
+    {% endset %}
+
+     <form action="" method="get" class="CentreAlignedWithParent {{AdditionalClass}}" onsubmit="WhileLoading()">
+        <table class="CountryTable CentreAlignedWithParent">
+
+            {% for box in plotter.InputBoxes %}
+
+                {%- set InvalidMessage -%}
+                    {{box.label}}, or go back a step to change the number of countries in your graph
+                {% endset %}
+
+                {% if DesktopForm %}
+                    <tr>
+                        {{ LabelCell(box, "left") }}
+                        {{ DropdownMenu(box, InvalidMessage, plotter, "left") }}
+                    </tr>
+
+                {% else %}
+                    {% set RowClass %}{{ "BiggerRow" if loop.index0 else "" }}{% endset %}
+                    <tr class="{{RowClass}}">{{ LabelCell(box, "center") }}</tr>
+                    <tr>{{ DropdownMenu(box, InvalidMessage, plotter, "center") }}</tr>
+
+                {% endif %}
+
+            {% endfor %}
+        </table>
+
+        <p></p>
+
+        <table class="MakeGraphButtonsTable CentreAlignedWithParent">
+            {% if DesktopForm %}
+                <tr>    {{ SelectCountrySubmit }}     {{ GoBackOneStep }} </tr>
+            {% else %}
+                <tr>{{ SelectCountrySubmit }}</tr>
+                <tr>{{ GoBackOneStep }}</tr>
+            {% endif %}
+        </table>
+
+    </form>
+
+{% endmacro %}

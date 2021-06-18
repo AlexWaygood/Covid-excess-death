@@ -2,16 +2,11 @@ footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 10rem;            /* Footer height */
   text-align: center;
   letter-spacing: 0.3px;
   text-decoration: none;
   align: inline-block;
   z-index: 1;
-}
-
-footer p{
-  margin-top: 50px;
 }
 
 /* Social media links in the footer */
@@ -44,4 +39,41 @@ footer img:checked {
   -moz-transform: scale(1.1);
   transform: scale(1.1);
   filter: invert(1)
+}
+
+@media screen and (max-width: 400px){
+  footer{
+    height: 15rem;
+  }
+
+  footer p{
+    margin-top: 50px;
+  }
+
+
+  #BigScreenFooter{
+    display: none
+  }
+
+  #SmallScreenFooter{
+    display: inline
+  }
+}
+
+@media screen and (min-width: 401px){
+  footer{
+    height: 10rem
+  }
+
+  footer p{
+    margin-top: 50px;
+  }
+
+  #BigScreenFooter{
+    display: inline
+  }
+
+  #SmallScreenFooter{
+    display: none
+  }
 }

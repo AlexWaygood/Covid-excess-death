@@ -1,6 +1,7 @@
 /* Styling for the site header */
 
 header {
+  width: 100%;
   font-family: serif;
   background-color: #DFB887;
   padding-top: 25px;
@@ -13,7 +14,6 @@ header {
 header img{
   float: left;
   height: 5.8vw;
-  margin-top: -3vh;
   margin-right: 30px;
 }
 
@@ -29,16 +29,7 @@ header img{
 header a {
   color: #fff;
   text-decoration: none;
-  float: left;
   margin: 0;
-}
-
-header h1 .BigScreenHeader {
-  font-size: 2.5vw;
-}
-
-header h1 .SmallScreenHeader {
-  display: none
 }
 
 header a:hover{
@@ -52,7 +43,6 @@ header a:checked{
 /* Header navigation bar */
 
 header nav{
-  float: right;
   display: block;
 }
 
@@ -60,98 +50,68 @@ header li{
   list-style-type: none;
 }
 
-.DesktopMenu{
-  float: left;
-  display: inline;
-  padding: 0 20px 0 20px;
-  font-weight: bold;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-  font-size: 1.05em;
-}
-
-.MobileMenu{
-  display: none;
-  float: center;
-  padding: 0 20px 0 50px;
-  font-weight: bold;
-  text-decoration: none;
-  letter-spacing: 0.5px;
-  font-size: 1.05em;
-  text-align: center;
-  margin-left: -30px;
-}
-
-/* Hamburger menu, for display on mobile devices only */
+/* All remaining style features are responsive to the size of the screen. */
 
 /* The HamburgerMenu() function in scripts.js turns this class on and off for various parts of the html */
-.toggle{ display: none; }
+.toggle{
+  display: none;
+}
 
 #nav_btn{
   display: none;
-  float: right;
-  padding: 20px;
-  cursor: pointer;
 }
 
-#nav_btn span, #nav_btn span::before, #nav_btn span::after{
-  width: 28px;
-  height: 4px;
-  display: block;
-  background: #000;
-  position: relative;
-  text-indent: -9000px;
-  -webkit-transition: all 300ms ease-in-out;
-  -moz-transition: all 300ms ease-in-out;
-  -ms-transition: all 300ms ease-in-out;
-  -o-transition: all 300ms ease-in-out;
-  transition: all 300ms ease-in-out;
+@media screen and (min-width: 681px){
+  header h1 .BigScreenHeader {
+    font-size: 2.5vw;
+  }
+
+  header h1 .SmallScreenHeader {
+    display: none
+  }
+
+  header a {
+    float: left;
+  }
+
+  header img {
+    margin-top: -3vh;
+  }
+
+  .DesktopMenu{
+    float: left;
+    display: inline;
+    padding: 0 20px 0 20px;
+    font-weight: bold;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    font-size: 1.05em;
+  }
+
+  .MobileMenu{
+    display: none;
+  }
+
+  header nav{
+    float: right;
+  }
+
+  header nav ul{
+    margin-block-start: 1em
+  }
+
+  #nav_btn{
+    display: none;
+  }
 }
 
-#nav_btn span{
-  margin: 8px 0;
-}
-
-#nav_btn span::before, #nav_btn span::after{
-  content: '';
-  position: absolute;
-}
-
-#nav_btn span::before{
-  top: -8px;
-}
-
-#nav_btn span::after{
-  bottom: -8px;
-}
-
-#nav_btn.active span{
-  background-color: transparent;
-}
-
-#nav_btn.active span::before, #nav_btn.active span::after{
-  top: 0;
-}
-
-#nav_btn.active span:before{
-  transform: rotate(45deg);
-  -webkit-transform: rotate(45deg);
-}
-
-#nav_btn.active span::after{
-  transform: translateY(-10px) rotate(-45deg);
-  -webkit-transform: translateY(-10px) rotate(-45deg);
-  top: 10px;
-}
-
-
-@media(max-width: 783px){
+@media screen and (min-width: 681px) and (max-width: 783px){
   header img{
     margin-top: 0;
   }
 }
 
-@media(max-width: 680px){
+@media screen and (max-width: 680px){
   header h1 .BigScreenHeader{
     display: none;
   }
@@ -177,6 +137,14 @@ header li{
   .MobileMenu{
     display: block;
     margin-top: 20px;
+    float: center;
+    padding: 0 20px 0 50px;
+    font-weight: bold;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    font-size: 1.05em;
+    text-align: center;
+    margin-left: -30px;
   }
 
   .toggle{
@@ -196,5 +164,57 @@ header li{
     display: block;
     margin-top: -80px;
     float: right;
+    padding: 20px;
+    cursor: pointer;
+  }
+
+  #nav_btn span, #nav_btn span::before, #nav_btn span::after{
+    width: 28px;
+    height: 4px;
+    display: block;
+    background: #000;
+    position: relative;
+    text-indent: -9000px;
+    -webkit-transition: all 300ms ease-in-out;
+    -moz-transition: all 300ms ease-in-out;
+    -ms-transition: all 300ms ease-in-out;
+    -o-transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;
+  }
+
+  #nav_btn span{
+    margin: 8px 0;
+  }
+
+  #nav_btn span::before, #nav_btn span::after{
+    content: '';
+    position: absolute;
+  }
+
+  #nav_btn span::before{
+    top: -8px;
+  }
+
+  #nav_btn span::after{
+    bottom: -8px;
+  }
+
+  #nav_btn.active span{
+    background-color: transparent;
+  }
+
+  #nav_btn.active span::before, #nav_btn.active span::after{
+    top: 0;
+  }
+
+  #nav_btn.active span:before{
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }
+
+  #nav_btn.active span::after{
+    transform: translateY(-10px) rotate(-45deg);
+    -webkit-transform: translateY(-10px) rotate(-45deg);
+    top: 10px;
   }
 }

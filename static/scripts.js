@@ -22,9 +22,9 @@ function CopyLinkToClipboard(){
 }
 
 function AddSocialShareLinks(){
-    document.getElementById("twitter_icon").addEventListener("click", TwitterShare);
-    document.getElementById("facebook_icon").addEventListener("click", FacebookShare);
-    document.getElementById("linkedin_icon").addEventListener("click", LinkedInShare);
+    document.getElementById("Twitter_icon").addEventListener("click", TwitterShare);
+    document.getElementById("Facebook_icon").addEventListener("click", FacebookShare);
+    document.getElementById("LinkedIn_icon").addEventListener("click", LinkedInShare);
     document.getElementById("clipboard_copy_icon").addEventListener("click", CopyLinkToClipboard);
 }
 
