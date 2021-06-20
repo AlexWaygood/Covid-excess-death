@@ -5,6 +5,7 @@ error_logs/*
 !error_logs/empty_file_for_git.txt
 src/common_files/secret_passwords.py
 src/web_app/google-auth-credentials.json
+all_requirements_unstrict.txt
 
 # Editors
 .vscode/

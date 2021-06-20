@@ -10,7 +10,7 @@
     {% block content %}
         <div class="CentreAlignedToParent Centred">
             <h1>It doesn't look like this page exists :(</h1>
-            {{ Button(url_for('home'), "Head home", class="CentreAlignedToParent") }}
+            {{ Button(url_for('static_routes', page='home'), "Head home", class="CentreAlignedToParent") }}
         </div>
     {% endblock %}
 

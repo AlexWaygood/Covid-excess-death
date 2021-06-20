@@ -37,12 +37,12 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {% for content, FB_Name, TwitterName in TwitterAndFacebookTags %}
-            {{ SocialTag(content, FB_Name=FacebookName, TwitterName=TwitterName) }}
+        {%- for content, FB_Name, TwitterName in TwitterAndFacebookTags %}
+            {{ SocialTag(content, FB_Name=FB_Name, TwitterName=TwitterName) }}
         {% endfor %}
 
         {% for content, FB_Name in FacebookTags %}
-            {{ SocialTag(content, FB_Name=FacebookName) }}
+            {{ SocialTag(content, FB_Name=FB_Name) }}
         {% endfor %}
 
         {% for content, TwitterName in TwitterTags %}
@@ -78,8 +78,15 @@
                 <header><div class='HeaderContainer'>
                     <h1>
                         {{ Image('coronavirus.ico', 'Coronavirus icon') }}
-                        <a class="BigScreenHeader" href="/">Pandemic excess deaths: interactive web viewer</a>
-                        <a class="SmallScreenHeader" href="/">Pandemic excess deaths</a>
+
+                        {% set HeaderVars = (('Big', ': interactive web viewer'), ('Small', '')) %}
+                        {% set HomeURL = url_for('static_routes', page='home') %}
+
+                        {% for classPrefix, TitleSuffix in HeaderVars %}
+                            <a class="{{classPrefix}}ScreenHeader" href="{{HomeURL}}">
+                                Pandemic excess deaths{{TitleSuffix}}
+                            </a>
+                        {% endfor %}
                     </h1>
 
                     <nav><ul>

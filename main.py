@@ -13,14 +13,11 @@ from flask import Flask, render_template, send_from_directory, request
 from time import sleep
 import src.common_files.unchanging_constants as uc
 
-if use_case.LOCAL_HOSTING:
-    from warnings import filterwarnings
-    filterwarnings('ignore')
-
-from typing import TYPE_CHECKING, Optional, Tuple, Final
+from typing import TYPE_CHECKING, Optional, Final, Dict, Any
 
 if TYPE_CHECKING:
     from src.web_app.web_graph_plotting import WebGraphPlotter
+    from src.common_files.covid_graph_types import PAGE_AND_ERROR_CODE
     from expiringdict import ExpiringDict
 
 
@@ -32,13 +29,7 @@ plotter: Optional[WebGraphPlotter] = None
 Cached_pages: Optional[ExpiringDict[str, str]] = None
 
 
-def render_page(page: str, FromRedirect: bool = False) -> str:
-    """Helper function for the cached_template_renderer()"""
-
-    return render_template(page, plotter=plotter, FromRedirect=FromRedirect)
-
-
-def cached_template_renderer(page: str, dataviewer_request: bool = False, FromRedirect: bool = False) -> str:
+def cached_template_renderer(page: str) -> str:
     """
     A template renderer that caches its results.
     Only the /dataviewer/?HowManyCountries=random route is dynamic, and that route isn't sent to this function.
@@ -48,19 +39,16 @@ def cached_template_renderer(page: str, dataviewer_request: bool = False, FromRe
     so we have to check they exist before using them.
     """
 
-    if plotter and not dataviewer_request:
-        plotter.Reset()
-
-    if not Cached_pages:
-        return render_page(page, FromRedirect=FromRedirect)
+    if any((Cached_pages is None, page == uc.DATAVIEWER_1_PAGE, (bool(plotter) and plotter.RandomGraphSelected))):
+        return render_template(page)
 
     # The dataviewer FromRedirect page will be the same every time, no matter what the typo in the URL is,
     # so it doesn't make sense to cache each typo separately.
 
-    key = None if FromRedirect else request.url
+    key = None if plotter.IncorrectEntry else request.url
 
     if key not in Cached_pages:
-        Cached_pages[key] = render_page(page, FromRedirect=FromRedirect)
+        Cached_pages[key] = render_template(page)
 
     return Cached_pages[key]
 
@@ -87,7 +75,7 @@ def threaded_before_first_request() -> None:
     Cached_pages = ExpiringDict(1_000_000, 86_400)
 
 
-### Configuration routes ###
+### Configuration functions ###
 
 
 @app.before_first_request
@@ -100,6 +88,17 @@ def InitialiseManager() -> None:
     Thread(target=threaded_before_first_request).start()
 
 
+@app.before_request
+def UpdatePlotter() -> None:
+    if plotter:
+        plotter.Update(request.url_root, request.path, **request.args)
+
+
+@app.context_processor
+def inject_plotter() -> Dict[str, Any]:
+    return {'plotter': plotter}
+
+
 @app.route('/robots.txt')
 def static_from_root() -> str:
     """The robots.txt file defines whether robots are allowed to crawl this site or not."""
@@ -107,7 +106,7 @@ def static_from_root() -> str:
     return send_from_directory(app.static_folder, request.path[1:])
 
 
-@app.route('/link-image/')
+@app.route('/link-image')
 def social_media_link_preview() -> str:
     """The image that's shown on links when they're shared on Facebook/Twitter"""
 
@@ -117,33 +116,28 @@ def social_media_link_preview() -> str:
 ### Specific webpage routes ###
 
 
-@app.route('/')
-def home() -> str:
-    return cached_template_renderer(uc.HOME_PAGE)
-
-
-@app.route('/404')
-@app.route('/500')
-@app.route('/about')
-def about() -> str:
-    return cached_template_renderer(f'{request.path}.html')
-
-
 @app.route('/dataviewer/')
 def dataviewer() -> str:
-    while not plotter:
-        sleep(0.5)
+    if not plotter:
+        while not plotter:
+            sleep(0.5)
+        UpdatePlotter()
 
-    plotter.Update(request)
+    return cached_template_renderer(plotter.TemplateForRendering)
 
-    if plotter.RandomGraphSelected:
-        return render_page(uc.DATAVIEWER_2_PAGE)
 
-    return cached_template_renderer(
-        plotter.TemplateForRendering,
-        dataviewer_request=True,
-        FromRedirect=plotter.IncorrectEntry
-    )
+@app.route('/', defaults={'page': 'home'})
+@app.route('/<page>')
+def static_routes(page: str) -> str:
+
+    """
+    Function for all static routes that are directly mapped onto an html template:
+    home.html, about.html, 404.html, 500.html.
+
+    This function must be defined last of all routes, due to the "catch-all" nature of the url_rule defined.
+    """
+
+    return cached_template_renderer(f'{page}.html')
 
 
 ### Error handlers ###
@@ -151,13 +145,13 @@ def dataviewer() -> str:
 
 # noinspection PyUnusedLocal
 @app.errorhandler(404)
-def page_not_found(e) -> Tuple[str, int]:
+def page_not_found(e) -> PAGE_AND_ERROR_CODE:
     return cached_template_renderer(uc.PAGE_NOT_FOUND_PAGE), 404
 
 
 # noinspection PyUnusedLocal
 @app.errorhandler(500)
-def ServerError(e) -> Tuple[str, int]:
+def ServerError(e) -> PAGE_AND_ERROR_CODE:
     return cached_template_renderer(uc.SERVER_ERROR_PAGE), 500
 
 

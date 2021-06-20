@@ -14,8 +14,8 @@
             <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
 
                 {% set ButtonVals = (
-                    (url_for('dataviewer'),     "Make a graph",     {'onclick': 'WhileLoading()'}),
-                    (url_for('home'),           "Head home",        {})
+                    (url_for('dataviewer'),                     "Make a graph",     {'onclick': 'WhileLoading()'}),
+                    (url_for('static_routes', page='home'),     "Head home",        {})
                 ) %}
 
                 {{ MultipleButtons(ButtonVals, "MakeGraphButton CentreAlignedWithParent") }}

@@ -36,9 +36,9 @@
 
         <table class="MakeGraphButtonsTable CentreAlignedWithParent"><tr>
             {% set ButtonVals = (
-                (plotter.img,           "Download graph",       {'download': plotter.ImageTitle}),
-                (url_for('dataviewer'), "Make another graph",   {}),
-                (url_for('about'),      "About these graphs",   {})
+                (plotter.img,                               "Download graph",       {'download': plotter.ImageTitle}),
+                (url_for('dataviewer'),                     "Make another graph",   {}),
+                (url_for('static_routes', page='about'),    "About these graphs",   {})
             ) %}
 
             {{ MultipleButtons(ButtonVals, "MakeAnotherGraphButton CentreAlignedToParent") }}

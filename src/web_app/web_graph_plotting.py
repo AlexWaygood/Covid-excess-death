@@ -9,7 +9,6 @@ from src.common_files.graph_plotting import GraphPlotter
 
 if TYPE_CHECKING:
 	from src.common_files.covid_graph_types import STRING_LIST
-	from flask import Request
 
 
 class InputBox:
@@ -28,8 +27,8 @@ class InputBox:
 # noinspection PyAttributeOutsideInit
 @final
 class WebGraphPlotter(GraphPlotter):
-	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'TemplateForRendering', '_IncorrectEntry', 'RandomGraphSelected', \
-	            'RandomGraphPermanentURL'
+	__slots__ = 'CountryNumber', 'img', 'InputBoxes', 'TemplateForRendering', 'IncorrectEntry', 'RandomGraphSelected', \
+	            'RandomGraphPermanentURL', 'url_root'
 
 	def __init__(self) -> None:
 		super().__init__(
@@ -39,8 +38,8 @@ class WebGraphPlotter(GraphPlotter):
 			GUIUsage=False
 		)
 
-	def Reset(self) -> WebGraphPlotter:
-		super().Reset()
+	def _Reset(self) -> WebGraphPlotter:
+		super()._Reset()
 		self.CountryNumber = 0
 		self.img = ''
 		self.InputBoxes = ['']
@@ -50,44 +49,46 @@ class WebGraphPlotter(GraphPlotter):
 		self.RandomGraphPermanentURL = ''  # Only relevant if the user has asked for a random graph
 		return self
 
-	@property
-	def IncorrectEntry(self) -> bool:
-		IncorrectEntry = self._IncorrectEntry
-		self._IncorrectEntry = False
-		return IncorrectEntry
-
-	@IncorrectEntry.setter
-	def IncorrectEntry(self, value: bool) -> None:
-		self._IncorrectEntry = value
-
-	def RandomGraph(self, url_root: str) -> None:
+	def RandomGraph(self) -> None:
 		self.RandomGraphSelected = True
 		countries = self.RandomCountries()
 
-		self.RandomGraphPermanentURL = ''.join((
-			url_root,
-			'/dataviewer/?',
-			'&'.join(f'Country{i}={country}' for i, country in enumerate(countries))
-		))
+		self.RandomGraphPermanentURL = \
+			f"{self.url_root}/dataviewer/?{'&'.join(f'Country{i}={country}' for i, country in enumerate(countries))}"
 
 		self.GraphAndTitle(countries)
 
-	def Update(self, request_context: Request) -> WebGraphPlotter:
+	# noinspection PyUnusedLocal
+	def Update(
+			self,
+			url_root: str,
+			path: str,
+			Country0: str = '',
+			Country1: str = '',
+			Country2: str = '',
+			Country3: str = '',
+			Country4: str = '',
+			HowManyCountries: str = '',
+			**kwargs: str
+	) -> WebGraphPlotter:
+
+		if not path.startswith('/dataviewer/'):
+			return self._Reset()
+
 		self.ImageTitle = ''
 		self.img = ''
 		self.RandomGraphSelected = False
 		self.RandomGraphPermanentURL = ''
 
-		if Country0 := request_context.args.get('Country0'):
+		if Country0:
 			self.CountryNumber, countries = 1, [Country0]
 
-			while (
-					self.CountryNumber < st.MAX_COUNTRIES
-					and bool(country := (request_context.args.get(f'Country{self.CountryNumber}')))
-			):
+			for arg in (Country1, Country2, Country3, Country4):
+				if not arg:
+					break
+
 				self.CountryNumber += 1
-				# noinspection PyUnboundLocalVariable
-				countries.append(country)
+				countries.append(arg)
 
 			self.WaitForLoad()
 
@@ -100,16 +101,17 @@ class WebGraphPlotter(GraphPlotter):
 			self.GraphAndTitle(countries)
 			return self
 
-		elif CountryNumber := request_context.args.get('HowManyCountries'):
+		elif HowManyCountries:
 			self.IncorrectEntry = False
 
-			if CountryNumber == 'random':
+			if HowManyCountries == 'random':
+				self.url_root = url_root
 				self.WaitForLoad()
-				self.RandomGraphLoop(url_root=request_context.url_root)
+				self.RandomGraphLoop()
 			else:
 				try:
-					assert float(CountryNumber).is_integer()
-					CountryNumber = int(CountryNumber)
+					assert float(HowManyCountries).is_integer()
+					CountryNumber = int(HowManyCountries)
 					assert st.MIN_COUNTRIES <= CountryNumber <= st.MAX_COUNTRIES
 					self.CountryNumber = CountryNumber
 					self.TemplateForRendering = DATAVIEWER_1_PAGE

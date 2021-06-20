@@ -1,12 +1,12 @@
-{% macro Navigation_Link(class, endpoint, name, script) %}
-    <li class="{{class}}"><a href="{{ url_for(endpoint) }}" onclick="{{script}}">{{name}}</a></li>
+{% macro Navigation_Link(class, endpoint, name, page='', script='') %}
+    <li class="{{class}}"><a href='{{ url_for(endpoint, page=page) }}' onclick="{{script}}">{{name}}</a></li>
 {% endmacro %}
 
 
 {% macro Navigation_Bar(class) %}
-    {{ Navigation_Link(class, 'home', 'Home', '') }}
-    {{ Navigation_Link(class, 'about', 'About', '') }}
-    {{ Navigation_Link(class, 'dataviewer', 'Make a graph', 'WhileLoading()') }}
+    {{ Navigation_Link(class, 'static_routes', 'Home', page='home') }}
+    {{ Navigation_Link(class, 'static_routes', 'About', page='about') }}
+    {{ Navigation_Link(class, 'dataviewer', 'Make a graph', script='WhileLoading()') }}
 {% endmacro %}
 
 
@@ -43,10 +43,22 @@
 {% endmacro %}
 
 
-{% macro AdditionalTags(Title, FourthTag=false) %}
+{% macro SocialTag(content, TwitterName='', FB_Name='') %}
 
-    <meta   property="og:title"         content="{{ Title }}"     />
-    <meta   name="twitter:title"        content="{{ Title }}"     />
+    {% if TwitterName %}
+        <meta name="twitter:{{TwitterName}}" content="{{content}}" />
+    {% endif %}
+
+    {% if FB_Name %}
+        <meta property="og:{{FB_Name}}" content="{{content}}" />
+    {% endif %}
+
+{% endmacro %}
+
+
+{% macro AdditionalTags(Title, FourthTag=false) %}
+    {{ SocialTag(Title, TwitterName='title', FB_Name='title') }}
+
     <meta   name="twitter:text:title"   content="{{ Title }}"     />
 
     {% if FourthTag %}
@@ -72,19 +84,6 @@
     {% for url, text, KwargDict in ButtonVals %}
         <td>{{ Button(url, text, class=class, **KwargDict) }}</td>
     {% endfor %}
-{% endmacro %}
-
-
-{% macro SocialTag(content, TwitterName='', FB_Name='') %}
-
-    {% if TwitterName %}
-        <meta name="twitter:{{TwitterName}}" content="{{content}}" />
-    {% endif %}
-
-    {% if FB_Name %}
-        <meta property="og:{{FB_Name}}" content="{{content}}" />
-    {% endif %}
-
 {% endmacro %}
 
 

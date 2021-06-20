@@ -115,7 +115,7 @@ class GraphPlotter:
         self.ReturnImage = ReturnImage
         self.InteractiveUse = InteractiveUse
         self.DataWrangled = False
-        self.Reset()
+        self._Reset()
         Thread(target=self.Initialise).start()
 
     def Initialise(self) -> None:
@@ -134,7 +134,7 @@ class GraphPlotter:
             sleep(0.5)
         return tuple(Country.AllCountries.keys())
 
-    def Reset(self) -> None:
+    def _Reset(self) -> None:
         self.data = None
         self.StartDate = None
         self.EndDate = None
@@ -203,15 +203,15 @@ class GraphPlotter:
         # noinspection PyTypeChecker
         return random_sample(self.CountryNames, randint(st.MIN_COUNTRIES, st.MAX_COUNTRIES))
 
-    def RandomGraph(self, **kwargs) -> None:
+    def RandomGraph(self) -> None:
         """Placeholder method to be filled in higher up the inheritance chain"""
         raise NotImplementedError
 
-    def RandomGraphLoop(self, **kwargs) -> None:
+    def RandomGraphLoop(self) -> None:
         for i in range(5):
             # noinspection PyBroadException
             try:
-                self.RandomGraph(**kwargs)
+                self.RandomGraph()
                 break
             except NotImplementedError:
                 raise
